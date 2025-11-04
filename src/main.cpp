@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <vector>
+#include <random>
 #include <OpenGL/gl3.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -63,7 +64,26 @@ int main() {
         verts, idx
     );
 
-    GameObject obj(&mesh, &shader);
+    std::vector<GameObject> entities;
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> rand_x(-40, 40);
+    std::uniform_int_distribution<> rand_y(-40, 40);
+    std::uniform_int_distribution<> rand_z(-100, 1);
+
+    for (int i=0; i < 100; i++) {
+        GameObject obj(&mesh, &shader);
+        obj.set_position(
+            glm::vec3(
+                rand_x(gen),
+                rand_y(gen),
+                rand_z(gen)
+            )
+        );
+        entities.push_back(obj);
+
+    }
 
     glm::mat4 view = glm::mat4(1.0f);
     view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
@@ -76,9 +96,24 @@ int main() {
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        obj.rotate_deg(0.0f, 0.5f, 0.0f);
-        
-        obj.render(camera);
+        for (auto& object : entities) {
+            glm::vec3 pos = object.get_position();
+            object.set_position(
+                pos += glm::vec3(0.0f, 0.0f, 0.5f)
+            );
+            if (pos.z > 0.1) {
+                object.set_position(
+                    glm::vec3(
+                        static_cast<float>(rand_x(gen)),
+                         static_cast<float>(rand_y(gen)),
+                        -100.0f
+                    )
+                );
+            }
+            object.rotate_deg(0.5f, 0.5f, 0.5f);
+            object.render(camera);
+        }
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
