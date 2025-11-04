@@ -7,6 +7,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "Shader.hpp"
 #include "Mesh.hpp"
+#include "Camera.hpp"
+#include "GameObject.hpp"
 
 const unsigned int W_WIDTH = 800;
 const unsigned int W_HEIGHT = 600;
@@ -58,29 +60,25 @@ int main() {
     );
 
     Mesh mesh(
-        verts, idx, &shader
+        verts, idx
     );
 
-    // Matrix stuff
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::rotate(model, glm::radians(45.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    GameObject obj(&mesh, &shader);
 
     glm::mat4 view = glm::mat4(1.0f);
     view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 
     glm::mat4 projection;
     projection = glm::perspective(glm::radians(55.0f), (float)(W_WIDTH / W_HEIGHT), 0.1f, 100.0f);
+
+    Camera camera(view, projection);
     
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        model = glm::rotate(model, glm::radians(0.5f), glm::vec3(0.0f, 1.0f, 0.0f));
+        obj.rotate_deg(0.0f, 0.5f, 0.0f);
         
-        mesh.shader->use();
-        mesh.shader->set_mat4("model", model);
-        mesh.shader->set_mat4("view", view);
-        mesh.shader->set_mat4("projection", projection);
-        mesh.render();
+        obj.render(camera);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

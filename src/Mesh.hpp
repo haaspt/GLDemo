@@ -8,12 +8,10 @@ class Mesh
 public:
     unsigned int id;
 
-    Mesh(std::vector<float> verts, std::vector<int> idxs, Shader* shader);
+    Mesh(std::vector<float> verts, std::vector<int> idxs);
     ~Mesh();
-
-    Shader* shader;
     
-    void render() const;
+    void draw() const;
 private:
     GLuint VAO, VBO, EBO;
     unsigned int index_count;

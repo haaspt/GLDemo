@@ -1,7 +1,7 @@
 #include "Mesh.hpp"
 
-Mesh::Mesh(std::vector<float> verts, std::vector<int> idxs, Shader* shader)
-    : shader(shader), index_count(idxs.size())
+Mesh::Mesh(std::vector<float> verts, std::vector<int> idxs)
+    : index_count(idxs.size())
 {
     // VAO setup
     glGenVertexArrays(1, &VAO);
@@ -60,8 +60,7 @@ Mesh::~Mesh() {
 }
 
 
-void Mesh::render() const {
-    shader->use();
+void Mesh::draw() const {
     glBindVertexArray(VAO);
     glDrawElements(
         GL_TRIANGLES,
