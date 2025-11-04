@@ -3,8 +3,8 @@
 void GameObject::render(const Camera& camera) const {
     shader->use();
     shader->set_mat4("model", transform);
-    shader->set_mat4("view", camera.view);
-    shader->set_mat4("projection", camera.projection);
+    shader->set_mat4("view", camera.get_view_matrix());
+    shader->set_mat4("projection", camera.get_projection_matrix());
     mesh->draw();
 }
 

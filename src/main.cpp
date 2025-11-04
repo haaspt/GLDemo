@@ -11,8 +11,8 @@
 #include "Camera.hpp"
 #include "GameObject.hpp"
 
-const unsigned int W_WIDTH = 800;
-const unsigned int W_HEIGHT = 600;
+constexpr unsigned int W_WIDTH = 800;
+constexpr unsigned int W_HEIGHT = 600;
 
 void initWindow(GLFWwindow*& window) {
     glfwInit();
@@ -68,11 +68,11 @@ int main() {
 
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<> rand_x(-40, 40);
-    std::uniform_int_distribution<> rand_y(-40, 40);
-    std::uniform_int_distribution<> rand_z(-100, 1);
+    std::uniform_int_distribution<> rand_x(-250, 250);
+    std::uniform_int_distribution<> rand_y(-250, 250);
+    std::uniform_int_distribution<> rand_z(-500, 1);
 
-    for (int i=0; i < 100; i++) {
+    for (int i=0; i < 500; i++) {
         GameObject obj(&mesh, &shader);
         obj.set_position(
             glm::vec3(
@@ -85,13 +85,9 @@ int main() {
 
     }
 
-    glm::mat4 view = glm::mat4(1.0f);
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-
-    glm::mat4 projection;
-    projection = glm::perspective(glm::radians(55.0f), (float)(W_WIDTH / W_HEIGHT), 0.1f, 100.0f);
-
-    Camera camera(view, projection);
+    Camera camera(55.0f, static_cast<float>(W_WIDTH) / W_HEIGHT, 0.1f, 500.0f);
+    camera.set_position(0.0f, 0.0f, -3.0f);
+    camera.set_yaw(-90);
     
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -99,14 +95,14 @@ int main() {
         for (auto& object : entities) {
             glm::vec3 pos = object.get_position();
             object.set_position(
-                pos += glm::vec3(0.0f, 0.0f, 0.5f)
+                pos += glm::vec3(0.0f, 0.0f, 5.0f)
             );
             if (pos.z > 0.1) {
                 object.set_position(
                     glm::vec3(
                         static_cast<float>(rand_x(gen)),
                          static_cast<float>(rand_y(gen)),
-                        -100.0f
+                        -500.0f
                     )
                 );
             }
