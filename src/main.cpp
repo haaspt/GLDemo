@@ -18,7 +18,7 @@ void initWindow(GLFWwindow*& window) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(W_WIDTH, W_HEIGHT, "OpenGL Demo", NULL, NULL);
+    window = glfwCreateWindow(W_WIDTH, W_HEIGHT, "OpenGL Demo", nullptr, nullptr);
 
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
@@ -87,14 +87,22 @@ int main() {
     Camera camera(55.0f, static_cast<float>(W_WIDTH) / W_HEIGHT, 0.1f, 500.0f);
     camera.set_position(0.0f, 0.0f, -3.0f);
     camera.set_yaw(-90);
+
+    double delta_t = 0.0;
+    double last = glfwGetTime();
+    double now = 0.0;
     
     while (!glfwWindowShouldClose(window)) {
+        now = glfwGetTime();
+        delta_t = now - last;
+        last = now;
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         for (auto& object : entities) {
             glm::vec3 pos = object.get_position();
             object.set_position(
-                pos += glm::vec3(0.0f, 0.0f, 5.0f)
+                pos += (glm::vec3(0.0f, 0.0f, 1.0f) * static_cast<float>(600.0f * delta_t))
             );
             if (pos.z > 0.1) {
                 object.set_position(
@@ -105,7 +113,9 @@ int main() {
                     )
                 );
             }
-            object.rotate_deg(0.5f, 0.5f, 0.5f);
+            glm::vec3 rot{1.0f};
+            rot *= static_cast<float>(60.0f * delta_t);
+            object.rotate_deg(rot);
             object.render(camera);
         }
 
