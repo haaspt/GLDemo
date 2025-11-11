@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.20)
 project(GLDemo)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 
 if(APPLE)
     add_compile_definitions(GL_SILENCE_DEPRECATION)
