@@ -3,6 +3,7 @@ build/
 vcpkg_installed/
 .vscode/
 .idea/
+cmake-build-debug/
 
 *.dblite
 *.o
