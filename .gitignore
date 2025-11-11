@@ -2,6 +2,7 @@ build/
 .venv/
 vcpkg_installed/
 .vscode/
+.idea/
 
 *.dblite
 *.o
