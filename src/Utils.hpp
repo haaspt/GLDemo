@@ -13,13 +13,13 @@ template <typename T> int sign(T value) {
     return 0;
 }
 
-inline double magnitude(const glm::vec2& vec) {
+inline float magnitude(const glm::vec2& vec) {
     return std::sqrt(
         (vec.x * vec.x) + (vec.y * vec.y)
         );
 }
 
-inline double magnitude(const glm::vec3& vec) {
+inline float magnitude(const glm::vec3& vec) {
     return std::sqrt(
         (vec.x * vec.x) + (vec.y * vec.y) + (vec.z * vec.z)
         );

@@ -94,24 +94,28 @@ int main() {
     camera.set_position(0.0f, 0.0f, -3.0f);
     camera.set_yaw(-90);
 
-    double delta_t = 0.0;
-    double last = glfwGetTime();
-    double now = 0.0;
 
-    double max_warp_speed = 1000;
-    double max_lateral_speed = 450;
+    // Movement and physics *should* be done as doubles
+    // but since OpenGL/GLM use float precision we'll
+    // just use floats for everything
+    float delta_t = 0.0;
+    float last = static_cast<float>(glfwGetTime());
+    float now = 0.0;
 
-    double warp_accel = 400;
-    double lateral_accel = 400;
-    double lateral_damping = 800;
+    float max_warp_speed = 1000;
+    float max_lateral_speed = 450;
 
-    double warp_speed = 600;
+    float warp_accel = 400;
+    float lateral_accel = 400;
+    float lateral_damping = 800;
+
+    float warp_speed = 600;
 
     glm::vec3 velocity_vector{0.0f, 0.0f, warp_speed};
     glm::vec3 accel_vector{0.0f};
     
     while (!glfwWindowShouldClose(window)) {
-        now = glfwGetTime();
+        now = static_cast<float>(glfwGetTime());
         delta_t = now - last;
         last = now;
 
@@ -125,13 +129,13 @@ int main() {
             velocity_vector += accel_vector * static_cast<float>(delta_t);
 
             if (std::abs(accel_vector.x) == 0) {  // No X, apply damping
-                velocity_vector.x += lateral_damping * delta_t * -sign<double>(velocity_vector.x);
+                velocity_vector.x += lateral_damping * delta_t * -sign<float>(velocity_vector.x);
                 if (std::abs(velocity_vector.x) < 1.0f) {
                     velocity_vector.x = 0.0f;
                 }
             }
             if (std::abs(accel_vector.y) == 0) {  // No X, apply damping
-                velocity_vector.y += lateral_damping * delta_t * -sign<double>(velocity_vector.y);
+                velocity_vector.y += lateral_damping * delta_t * -sign<float>(velocity_vector.y);
                 if (std::abs(velocity_vector.y) < 1.0f) {
                     velocity_vector.y = 0.0f;
                 }

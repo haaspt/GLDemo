@@ -24,11 +24,11 @@ glm::vec3 Input::get_input_vec() const {
     }
     key_state = glfwGetKey(window, GLFW_KEY_UP);
     if (key_state == GLFW_PRESS) {
-        input_vector.z += 1;  // RIGHT
+        input_vector.z += 1;  // Forward
     }
     key_state = glfwGetKey(window, GLFW_KEY_DOWN);
     if (key_state == GLFW_PRESS) {
-        input_vector.z -= 1;  // RIGHT
+        input_vector.z -= 1;  // Back
     }
     return input_vector;
 }
