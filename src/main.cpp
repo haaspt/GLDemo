@@ -30,6 +30,7 @@ void initWindow(GLFWwindow*& window) {
     int w, h;
     glfwGetFramebufferSize(window, &w, &h);
     glViewport(0, 0, w, h);
+    glfwSetWindowAspectRatio(window, W_WIDTH, W_HEIGHT);
 
     glEnable(GL_DEPTH_TEST);
 }
@@ -41,10 +42,10 @@ int main() {
     std::vector<float> verts {
         // position      // RGB
         -0.5, -0.5,  0.5,  0.5, 1.0, 1.0,  // base vertex 0
-        0.5, -0.5,  0.5,  1.0, 0.5, 1.0,  // base vertex 1
-        0.5, -0.5, -0.5,  1.0, 1.0, 0.5,  // base vertex 2
+         0.5, -0.5,  0.5,  1.0, 0.5, 1.0,  // base vertex 1
+         0.5, -0.5, -0.5,  1.0, 1.0, 0.5,  // base vertex 2
         -0.5, -0.5, -0.5,  0.5, 1.0, 1.0,  // base vertex 3
-        0.0,  0.5,  0.0,  1.0, 1.0, 1.0,  // apex vertex 4
+         0.0,  0.5,  0.0,  1.0, 1.0, 1.0,  // apex vertex 4
     };
     std::vector<int> idx {
         0, 1, 4,  // front face
@@ -55,13 +56,13 @@ int main() {
         0, 3, 2   // base triangle 2
     };
 
+    Mesh mesh(
+        verts, idx
+    );
+
     Shader shader(
         "/Users/patrickhaas/Developer/GLDemo/src/shaders/vertex.glsl",
         "/Users/patrickhaas/Developer/GLDemo/src/shaders/fragment.glsl"
-    );
-
-    Mesh mesh(
-        verts, idx
     );
 
     std::vector<GameObject> entities;
@@ -101,7 +102,7 @@ int main() {
                 object.set_position(
                     glm::vec3(
                         static_cast<float>(rand_x(gen)),
-                         static_cast<float>(rand_y(gen)),
+                        static_cast<float>(rand_y(gen)),
                         -500.0f
                     )
                 );

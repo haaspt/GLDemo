@@ -39,13 +39,13 @@ public:
         view_dirty = true;
     }
 
-    glm::mat4 get_view_matrix() const {
+    const glm::mat4& get_view_matrix() const {
         if (view_dirty) {
             update_view_matrix();
         }
         return view;
     }
-    glm::mat4 get_projection_matrix() const {
+    const glm::mat4& get_projection_matrix() const {
         return projection;
     }
 

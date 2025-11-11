@@ -24,8 +24,8 @@ std::string load_shader_source_from_file(const std::string& shader_path) {
 }
 
 Shader::Shader(const std::string& vertex_shader_path, const std::string& fragemnt_shader_path) {
-    std::string v_shader_source = load_shader_source_from_file(vertex_shader_path);
-    std::string f_shader_source = load_shader_source_from_file(fragemnt_shader_path);
+    const std::string v_shader_source = load_shader_source_from_file(vertex_shader_path);
+    const std::string f_shader_source = load_shader_source_from_file(fragemnt_shader_path);
 
     unsigned int v_shader, f_shader;
     int success;

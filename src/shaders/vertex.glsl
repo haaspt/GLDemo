@@ -5,8 +5,8 @@ layout (location = 1) in vec3 aColor;
 out vec3 vertexColor;
 
 uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
+uniform mat4 view;        // TODO load from uniform buffer object
+uniform mat4 projection;  // TODO ditto
 
 void main()
 {
