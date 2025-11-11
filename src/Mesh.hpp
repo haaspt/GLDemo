@@ -8,7 +8,7 @@ class Mesh
 public:
     unsigned int id;
 
-    Mesh(std::vector<float> verts, std::vector<int> idxs);
+    Mesh(const std::vector<float>& verts, const std::vector<int>& idxs);
     ~Mesh();
     
     void draw() const;

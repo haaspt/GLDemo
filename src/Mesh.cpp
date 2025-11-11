@@ -1,6 +1,6 @@
 #include "Mesh.hpp"
 
-Mesh::Mesh(std::vector<float> verts, std::vector<int> idxs)
+Mesh::Mesh(const std::vector<float>& verts, const std::vector<int>& idxs)
     : index_count(idxs.size())
 {
     // VAO setup

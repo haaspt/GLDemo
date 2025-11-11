@@ -34,6 +34,9 @@ add_executable(GLDemo src/main.cpp
         src/GameObject.hpp
         src/Camera.hpp
         src/main.cpp
+        src/Input.cpp
+        src/Input.hpp
+        src/Utils.hpp
 )
 
 target_link_libraries(GLDemo

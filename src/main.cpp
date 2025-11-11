@@ -8,17 +8,22 @@
 #include "Mesh.hpp"
 #include "Camera.hpp"
 #include "GameObject.hpp"
+#include "Input.hpp"
+#include "Utils.hpp"
 
 constexpr unsigned int W_WIDTH = 800;
 constexpr unsigned int W_HEIGHT = 600;
 
-void initWindow(GLFWwindow*& window) {
+constexpr float WORLD_BOUND_X = 250.0f;
+constexpr float WORLD_BOUND_Y = 250.0f;
+
+GLFWwindow* initWindow() {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(W_WIDTH, W_HEIGHT, "OpenGL Demo", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(W_WIDTH, W_HEIGHT, "OpenGL Demo", nullptr, nullptr);
 
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
@@ -31,11 +36,12 @@ void initWindow(GLFWwindow*& window) {
     glfwSetWindowAspectRatio(window, W_WIDTH, W_HEIGHT);
 
     glEnable(GL_DEPTH_TEST);
+    return window;
 }
 
 int main() {
-    GLFWwindow* window = nullptr;
-    initWindow(window);
+    GLFWwindow* window = initWindow();
+    Input input(window);
 
     std::vector<float> verts {
         // position      // RGB
@@ -67,8 +73,8 @@ int main() {
 
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<> rand_x(-250, 250);
-    std::uniform_int_distribution<> rand_y(-250, 250);
+    std::uniform_int_distribution<> rand_x(-WORLD_BOUND_X, WORLD_BOUND_X);
+    std::uniform_int_distribution<> rand_y(-WORLD_BOUND_Y, WORLD_BOUND_Y);
     std::uniform_int_distribution<> rand_z(-500, 1);
 
     for (int i=0; i < 500; i++) {
@@ -91,19 +97,60 @@ int main() {
     double delta_t = 0.0;
     double last = glfwGetTime();
     double now = 0.0;
+
+    double max_warp_speed = 1000;
+    double max_lateral_speed = 450;
+
+    double warp_accel = 400;
+    double lateral_accel = 400;
+    double lateral_damping = 800;
+
+    double warp_speed = 600;
+
+    glm::vec3 velocity_vector{0.0f, 0.0f, warp_speed};
+    glm::vec3 accel_vector{0.0f};
     
     while (!glfwWindowShouldClose(window)) {
         now = glfwGetTime();
         delta_t = now - last;
         last = now;
 
+        accel_vector = input.get_input_vec();
+
+        if (delta_t > 0) {
+            accel_vector.x *= lateral_accel;
+            accel_vector.y *= lateral_accel;
+            accel_vector.z *= warp_accel;
+
+            velocity_vector += accel_vector * static_cast<float>(delta_t);
+
+            if (std::abs(accel_vector.x) == 0) {  // No X, apply damping
+                velocity_vector.x += lateral_damping * delta_t * -sign<double>(velocity_vector.x);
+                if (std::abs(velocity_vector.x) < 1.0f) {
+                    velocity_vector.x = 0.0f;
+                }
+            }
+            if (std::abs(accel_vector.y) == 0) {  // No X, apply damping
+                velocity_vector.y += lateral_damping * delta_t * -sign<double>(velocity_vector.y);
+                if (std::abs(velocity_vector.y) < 1.0f) {
+                    velocity_vector.y = 0.0f;
+                }
+            }
+
+            velocity_vector.x = clamp<float>(velocity_vector.x, -max_lateral_speed, max_lateral_speed);
+            velocity_vector.y = clamp<float>(velocity_vector.y, -max_lateral_speed, max_lateral_speed);
+            velocity_vector.z = clamp<float>(velocity_vector.z, 0.0, max_warp_speed);
+        }
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         for (auto& object : entities) {
             glm::vec3 pos = object.get_position();
             object.set_position(
-                pos += (glm::vec3(0.0f, 0.0f, 1.0f) * static_cast<float>(600.0f * delta_t))
+                pos += (velocity_vector * static_cast<float>(delta_t))
             );
+
+            // Z wrap around
             if (pos.z > 0.1) {
                 object.set_position(
                     glm::vec3(
@@ -112,6 +159,23 @@ int main() {
                         -500.0f
                     )
                 );
+            }
+
+            // X/Y wrap around
+            if (pos.x > WORLD_BOUND_X) {
+                pos.x = -WORLD_BOUND_X;
+                object.set_position(pos);
+            } else if (pos.x < -WORLD_BOUND_X) {
+                pos.x = WORLD_BOUND_X;
+                object.set_position(pos);
+            }
+
+            if (pos.y > WORLD_BOUND_Y) {
+                pos.y = -WORLD_BOUND_Y;
+                object.set_position(pos);
+            } else if (pos.y < -WORLD_BOUND_Y) {
+                pos.y = WORLD_BOUND_Y;
+                object.set_position(pos);
             }
             glm::vec3 rot{1.0f};
             rot *= static_cast<float>(60.0f * delta_t);
