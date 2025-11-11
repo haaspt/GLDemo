@@ -3,14 +3,13 @@
 
 class Camera {
 public:
-    Camera(float fov_deg, float aspect_ratio, float near_plane_dist, float far_plane_dist) {
-        projection = glm::perspective(
-                glm::radians(fov_deg),
-                aspect_ratio,
-                near_plane_dist,
-                far_plane_dist
-            );
-    }
+    Camera(float fov_deg, float aspect_ratio, float near_plane_dist, float far_plane_dist)
+        : projection(glm::perspective(
+            glm::radians(fov_deg),
+            aspect_ratio,
+            near_plane_dist,
+            far_plane_dist
+    )) {}
     
     glm::vec3 get_position() const {
         return position;

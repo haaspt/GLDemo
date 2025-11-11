@@ -20,10 +20,7 @@ public:
         update_transform();
     }
     void set_position(float x, float y, float z) {
-        position.x = x;
-        position.y = y;
-        position.z = z;
-        update_transform();
+        set_position(glm::vec3(x, y, z));
     }
 
     glm::vec3 get_scale() const {
@@ -34,10 +31,7 @@ public:
         update_transform();
     }
     void set_scale(float x, float y, float z) {
-        scale.x = x;
-        scale.y = y;
-        scale.z = z;
-        update_transform();
+        set_scale(glm::vec3(x, y, z));
     }
 
     glm::vec3 get_rotation_rad() const {
@@ -48,21 +42,16 @@ public:
         update_transform();
     }
     void set_rotation_rad(float x_rad = 0.0f, float y_rad = 0.0f, float z_rad = 0.0f) {
-        rotation_rad.x = x_rad;
-        rotation_rad.y = y_rad;
-        rotation_rad.z = z_rad;
-        update_transform();
+        set_rotation_rad(glm::vec3(x_rad, y_rad, z_rad));
     }
     glm::vec3 get_rotation_deg() const {
         return glm::degrees(rotation_rad);
     }
     void set_rotation_deg(glm::vec3 rot_deg) {
-        rotation_rad = glm::radians(rot_deg);
-        update_transform();
+        set_rotation_rad(glm::radians(rot_deg));
     }
     void set_rotation_deg(float x_deg = 0.0f, float y_deg = 0.0f, float z_deg = 0.0f) {
-        rotation_rad = glm::radians(glm::vec3(x_deg, y_deg, z_deg));
-        update_transform();
+        set_rotation_rad(glm::radians(glm::vec3(x_deg, y_deg, z_deg)));
     }
 
     void rotate_rad(glm::vec3 rot_rad) {
@@ -70,16 +59,13 @@ public:
         update_transform();
     }
     void rotate_rad(float x_rad = 0.0f, float y_rad = 0.0f, float z_rad = 0.0f) {
-        rotation_rad += glm::vec3(x_rad, y_rad, z_rad);
-        update_transform();
+        rotate_rad(glm::vec3(x_rad, y_rad, z_rad));
     }
     void rotate_deg(glm::vec3 rot_deg) {
-        rotation_rad += glm::radians(rot_deg);
-        update_transform();
+        rotate_rad(glm::radians(rot_deg));
     }
     void rotate_deg(float x_deg = 0.0f, float y_deg = 0.0f, float z_deg = 0.0f) {
-        rotation_rad += glm::radians(glm::vec3(x_deg, y_deg, z_deg));
-        update_transform();
+        rotate_rad(glm::radians(glm::vec3(x_deg, y_deg, z_deg)));
     }
 
 private:

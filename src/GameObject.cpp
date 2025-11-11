@@ -20,4 +20,3 @@ void GameObject::update_transform() {
     
     transform = glm::scale(transform, scale);
 }
-
