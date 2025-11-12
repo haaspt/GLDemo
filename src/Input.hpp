@@ -5,14 +5,14 @@
 #pragma once
 
 #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
+#include "Vector.hpp"
 
 
 class Input {
 public:
     explicit Input(GLFWwindow* window) : window(window) {}
 
-    glm::vec3 get_input_vec() const;
+    Vector3 get_input_vec() const;
 
 private:
     GLFWwindow* window;

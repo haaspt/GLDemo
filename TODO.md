@@ -1,0 +1,6 @@
+- [ ] Implement textures
+- [ ] Resource loaders/managers
+- [ ] Lighting
+- [ ] Basic physics
+- [ ] Particle system?
+- [ ] Animation system?
