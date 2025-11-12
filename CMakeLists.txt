@@ -23,7 +23,14 @@ FetchContent_Declare(
         GIT_TAG 1.0.1
 )
 
-FetchContent_MakeAvailable(glfw glm)
+# Google Test
+FetchContent_Declare(
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG v1.14.0
+)
+
+FetchContent_MakeAvailable(glfw glm googletest)
 
 add_executable(GLDemo src/main.cpp
         src/Mesh.cpp
@@ -46,3 +53,27 @@ target_link_libraries(GLDemo
         glm::glm
         "-framework OpenGL"
 )
+
+# Enable testing
+enable_testing()
+
+# Test executable
+add_executable(tests
+        tests/test_vector.cpp
+        tests/test_transform.cpp
+        src/Vector.cpp
+        src/Vector.hpp
+        src/Utils.hpp
+)
+
+target_include_directories(tests PRIVATE ${CMAKE_SOURCE_DIR}/src)
+
+target_link_libraries(tests
+        GTest::gtest
+        GTest::gtest_main
+        GTest::gmock
+        glm::glm
+)
+
+# Add test to CTest
+add_test(NAME VectorTests COMMAND tests)
