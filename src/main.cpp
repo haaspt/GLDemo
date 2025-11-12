@@ -129,30 +129,28 @@ int main() {
             velocity_vector += accel_vector * static_cast<float>(delta_t);
 
             if (std::abs(accel_vector.x) == 0) {  // No X, apply damping
-                velocity_vector.x += lateral_damping * delta_t * -sign<float>(velocity_vector.x);
+                velocity_vector.x += lateral_damping * delta_t * -sign(velocity_vector.x);
                 if (std::abs(velocity_vector.x) < 1.0f) {
                     velocity_vector.x = 0.0f;
                 }
             }
             if (std::abs(accel_vector.y) == 0) {  // No X, apply damping
-                velocity_vector.y += lateral_damping * delta_t * -sign<float>(velocity_vector.y);
+                velocity_vector.y += lateral_damping * delta_t * -sign(velocity_vector.y);
                 if (std::abs(velocity_vector.y) < 1.0f) {
                     velocity_vector.y = 0.0f;
                 }
             }
 
-            velocity_vector.x = clamp<float>(velocity_vector.x, -max_lateral_speed, max_lateral_speed);
-            velocity_vector.y = clamp<float>(velocity_vector.y, -max_lateral_speed, max_lateral_speed);
-            velocity_vector.z = clamp<float>(velocity_vector.z, 0.0, max_warp_speed);
+            velocity_vector.x = clamp(velocity_vector.x, -max_lateral_speed, max_lateral_speed);
+            velocity_vector.y = clamp(velocity_vector.y, -max_lateral_speed, max_lateral_speed);
+            velocity_vector.z = clamp(velocity_vector.z, 0.0f, max_warp_speed);
         }
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         for (auto& object : entities) {
+            object.set_velocity(velocity_vector);
             glm::vec3 pos = object.get_position();
-            object.set_position(
-                pos += (velocity_vector * static_cast<float>(delta_t))
-            );
 
             // Z wrap around
             if (pos.z > 0.1) {
@@ -184,6 +182,8 @@ int main() {
             glm::vec3 rot{1.0f};
             rot *= static_cast<float>(60.0f * delta_t);
             object.rotate_deg(rot);
+
+            object.update(delta_t);
             object.render(camera);
         }
 

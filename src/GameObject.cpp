@@ -20,3 +20,8 @@ void GameObject::update_transform() {
     
     transform = glm::scale(transform, scale);
 }
+
+void GameObject::update(float const delta_t) {
+    position += velocity * delta_t;
+    update_transform();
+}
