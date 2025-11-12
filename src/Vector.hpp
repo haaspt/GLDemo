@@ -16,7 +16,7 @@ struct Vector2 {
     double x;
     double y;
 
-
+    Vector2() : Vector2(0.0) {}
     Vector2(double x, double y) : x(x), y(y) {}
     explicit Vector2(double scalar) : x(scalar), y(scalar) {}
     static Vector2 ZERO() {return Vector2(0);}
@@ -93,6 +93,19 @@ struct Vector2 {
         x /= mag;
         y /= mag;
     }
+    Vector2 normalized() const {
+        Vector2 result;
+        
+        double mag = magnitude();
+        result.x = x / mag;
+        result.y = y / mag;
+        
+        return result;
+    }
+
+    double cross_z(const Vector2& other) const {
+        return x * other.y - y * other.x;
+    }
 
     glm::vec2 to_glm() const {return {static_cast<float>(x), static_cast<float>(y)};};
 
@@ -109,6 +122,7 @@ struct Vector3 {
     double y;
     double z;
 
+    Vector3() : Vector3(0.0) {}
     Vector3(double x, double y, double z): x(x), y(y), z(z) {}
     explicit Vector3(double scalar): x(scalar), y(scalar), z(scalar) {}
     static Vector3 ZERO() {return Vector3(0);}
@@ -188,6 +202,32 @@ struct Vector3 {
         y /= mag;
         z /= mag;
     }
+    Vector3 normalized() const {
+        Vector3 result;
+        
+        double mag = magnitude();
+        result.x = x / mag;
+        result.y = y / mag;
+        result.z = z / mag;
+
+        return result;
+    }
+
+    Vector3 cross(const Vector3& other) const;
+    friend Vector3 cross(const Vector3& a, const Vector3& b) {
+        return Vector3(
+            a.y * b.z - a.z * b.y,
+            a.z * b.x - a.x * b.z,
+            a.x * b.y - a.y * b.x
+        );
+    }
+
+    double dot(const Vector3& other) const {
+        return x * other.x + y * other.y + z * other.z;
+    }
+    friend double dot(const Vector3& a, const Vector3& b) {
+        return a.x * b.x + a.y * b.y + a.z * b.z;
+    }
 
     glm::vec3 to_glm() const {return {static_cast<float>(x), static_cast<float>(y), static_cast<float>(z)};}
     Vector3 to_radians() const {
@@ -204,6 +244,7 @@ struct Vector4 {
     double b;
     double a;
 
+    Vector4() : Vector4(0.0) {}
     Vector4(double r, double g, double b, double a) : r(r), g(g), b(b), a(a) {}
     explicit Vector4(double scalar) : r(scalar), g(scalar), b(scalar), a(scalar) {}
     static Vector4 ZERO() {return Vector4(0);}
@@ -290,6 +331,17 @@ struct Vector4 {
         b /= mag;
         a /= mag;
     }
+    Vector4 normalized() const {
+        Vector4 result;
+
+        double mag = magnitude();
+        result.r = r / mag;
+        result.g = g / mag;
+        result.b = b / mag;
+        result.a = a / mag;
+
+        return result;
+    }
 
     glm::vec4 to_glm() const {return {static_cast<float>(r), static_cast<float>(g), static_cast<float>(b), static_cast<float>(a)};}
     Vector4 to_radians() const {
@@ -304,7 +356,7 @@ struct Transform {
 private:
     double data[16];
 public:
-    Transform() : data{0} {}
+    Transform() : Transform(1.0) {}
     explicit Transform(double scalar) : data{0} {
         // x 0 0 0
         // 0 x 0 0
@@ -325,15 +377,31 @@ public:
         return data[row * 4 + col];
     }
 
-    Transform& translate(Vector3 translation_vec);
-    Transform& scale(Vector3 scale_vec);
-    Transform& rotate(double radians, Vector3 axis);
+    friend Transform operator*(const Transform& lhs, const Transform& rhs);
+    Transform& operator*=(const Transform& rhs);
+
+    Transform& translate(const Vector3& translation_vec);
+    Transform& scale(const Vector3& scale_vec);
+    Transform& rotate(double radians, const Vector3& axis);
 
     static Transform perspective(double fov_rad, double aspect, double z_near, double z_far);
 
     glm::mat4 to_glm() const {
         return glm::mat4(
-
-            )
+            // column 0
+            static_cast<float>(data[0]),  static_cast<float>(data[4]),
+            static_cast<float>(data[8]),  static_cast<float>(data[12]),
+            // column 1
+            static_cast<float>(data[1]),  static_cast<float>(data[5]),
+            static_cast<float>(data[9]),  static_cast<float>(data[13]),
+            // column 2
+            static_cast<float>(data[2]),  static_cast<float>(data[6]),
+            static_cast<float>(data[10]), static_cast<float>(data[14]),
+            // column 3
+            static_cast<float>(data[3]),  static_cast<float>(data[7]),
+            static_cast<float>(data[11]), static_cast<float>(data[15])
+        );
     }
 };
+
+Transform look_at(const Vector3& eye, const Vector3& target, const Vector3& up = Vector3(0.0, 1.0, 0.0));
