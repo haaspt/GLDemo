@@ -91,7 +91,7 @@ Transform& Transform::rotate(double radians, const Vector3& axis) {
     double s = std::sin(radians);
     double ic = 1.0 - c;
 
-    // Roration matix
+    // Rotation matix
     // [ xx*ic + c     xy*ic - z*s   xz*ic + y*s   0 ]
     // [ yx*ic + z*s   yy*ic + c     yz*ic - x*s   0 ]
     // [ zx*ic - y*s   zy*ic + x*s   zz*ic + c     0 ]

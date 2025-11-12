@@ -95,10 +95,7 @@ int main(int argc, char** argv) {
     camera.set_position(0.0, 0.0, -3.0);
     camera.set_yaw(-90);
 
-
-    // Movement and physics *should* be done as doubles
-    // but since OpenGL/GLM use float precision we'll
-    // just use floats for everything
+    
     double delta_t = 0.0;
     double last = glfwGetTime();
     double now = 0.0;
