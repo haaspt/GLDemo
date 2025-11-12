@@ -4,8 +4,8 @@
 
 #include "Input.hpp"
 
-glm::vec3 Input::get_input_vec() const {
-    glm::vec3 input_vector{0};
+Vector3 Input::get_input_vec() const {
+    Vector3 input_vector = Vector3::ZERO();
     int key_state = glfwGetKey(window, GLFW_KEY_W);
     if (key_state == GLFW_PRESS) {
         input_vector.y += 1;  // UP

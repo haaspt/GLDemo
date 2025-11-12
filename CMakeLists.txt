@@ -37,6 +37,7 @@ add_executable(GLDemo src/main.cpp
         src/Input.cpp
         src/Input.hpp
         src/Utils.hpp
+        src/Vector.hpp
 )
 
 target_link_libraries(GLDemo
