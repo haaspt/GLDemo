@@ -4,7 +4,7 @@ inline Vector3 Vector3::cross(const Vector3& other) const {
     return Vector3(
         y * other.z - z * other.y,
         z * other.x - x * other.z,
-        x * other.y - y * other.z
+        x * other.y - y * other.x
     );
 }
 
@@ -45,20 +45,16 @@ Transform& Transform::operator*=(const Transform& rhs) {
 }
 
 Transform& Transform::translate(const Vector3& vec) {
-    // x x x t0
-    // x x x t1
-    // x x x t2
-    // x x x t3
-    const double t0 = data[3];
-    const double t1 = data[7];
-    const double t2 = data[11];
-    const double t3 = data[15];
-
-    data[3] = data[0] * vec.x + data[1] * vec.y + data[2] * vec.z + t0;
-    data[7] = data[4] * vec.x + data[5] * vec.y + data[6] * vec.z + t1;
-    data[11] = data[8] * vec.x + data[9] * vec.y + data[10] * vec.z + t2;
-    data[15] = data[12] * vec.x + data[13] * vec.y + data[14] * vec.z + t3;
-
+    // 1 0 0 delta_x
+    // 0 1 0 delta_y
+    // 0 0 1 delta_z
+    // 0 0 0 1
+    Transform t(1.0);
+    t.at(0, 3) = vec.x;
+    t.at(1, 3) = vec.y;
+    t.at(2, 3) = vec.z;
+    
+    *this *= t;
     return *this;
 }
 
@@ -113,36 +109,49 @@ Transform& Transform::rotate(double radians, const Vector3& axis) {
 }
 
 Transform Transform::perspective(double fov_rad, double aspect, double z_near, double z_far) {
+    // [f/aspect, 0, 0, 0]
+    // [0, f, 0, 0]
+    // [0, 0, -(f+n)/(f-n), -2fn/(f-n)]
+    // [0, 0, -1, 0]
     const double tan_half_fov = std::tan(fov_rad / 2.0);
+    const double f = 1.0 / tan_half_fov;
 
     Transform result(0.0);
-    result.at(0, 0) = 1.0 / (aspect * tan_half_fov);
-    result.at(1, 1) = 1.0 / (tan_half_fov);
+    result.at(0, 0) = f / aspect;
+    result.at(1, 1) = f;
     result.at(2, 2) = - (z_far + z_near) / (z_far - z_near);
-    result.at(2, 3) = -1.0;
-    result.at(3, 2) = - (2.0 * z_far * z_near) / (z_far - z_near);
+    result.at(2, 3) = - (2.0 * z_far * z_near) / (z_far - z_near);
+    result.at(3, 2) = -1.0;
+    result.at(3, 3) = 0.0;
     return result;
 }
 
-Transform look_at(const Vector3& eye, const Vector3& target, const Vector3& up = Vector3(0.0, 1.0, 0.0)) {
+Transform look_at(const Vector3& eye, const Vector3& target, const Vector3& up) {
     const Vector3 f = (target - eye).normalized();
     const Vector3 s = f.cross(up).normalized();
     const Vector3 u = s.cross(f);
 
     Transform result(1.0);
 
+    // [R.x, R.y, R.z, -R·eye]
+    // [U.x, U.y, U.z, -U·eye]
+    // [-F.x, -F.y, -F.z, F·eye]
+    // [0, 0, 0, 1]
+    
     result.at(0, 0) = s.x;
-    result.at(1, 0) = s.y;
-    result.at(2, 0) = s.z;
-    result.at(0, 1) = u.x;
+    result.at(0, 1) = s.y;
+    result.at(0, 2) = s.z;
+    result.at(0, 3) = -s.dot(eye);
+    
+    result.at(1, 0) = u.x;
     result.at(1, 1) = u.y;
-    result.at(2, 1) = u.z;
-    result.at(0, 2) = f.x;
-    result.at(1, 2) = f.y;
-    result.at(2, 2) = f.z;
-    result.at(3, 0) = -s.dot(eye);
-    result.at(3, 1) = -u.dot(eye);
-    result.at(3, 2) = -f.dot(eye);
+    result.at(1, 2) = u.z;
+    result.at(1, 3) = -u.dot(eye);
+    
+    result.at(2, 0) = -f.x;
+    result.at(2, 1) = -f.y;
+    result.at(2, 2) = -f.z;
+    result.at(2, 3) = f.dot(eye);
 
     return result;
 }
