@@ -44,3 +44,9 @@ target_link_libraries(GLDemo
         glm::glm
         "-framework OpenGL"
 )
+
+add_custom_command(TARGET GLDemo POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+          ${CMAKE_CURRENT_SOURCE_DIR}/src/shaders
+          $<TARGET_FILE_DIR:GLDemo>/shaders
+  COMMENT "Copying shaders to runtime directory")

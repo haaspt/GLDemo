@@ -39,7 +39,7 @@ GLFWwindow* initWindow() {
     return window;
 }
 
-int main() {
+int main(int argc, char** argv) {
     GLFWwindow* window = initWindow();
     Input input(window);
 
@@ -65,8 +65,8 @@ int main() {
     );
 
     Shader shader(
-        "/Users/patrickhaas/Developer/GLDemo/src/shaders/vertex.glsl",
-        "/Users/patrickhaas/Developer/GLDemo/src/shaders/fragment.glsl"
+        shader_path_from_argv0(argv[0], "vertex.glsl").string(),
+        shader_path_from_argv0(argv[0], "fragment.glsl").string()
     );
 
     std::vector<GameObject> entities;

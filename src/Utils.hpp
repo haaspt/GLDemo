@@ -6,6 +6,8 @@
 
 #include <glm/glm.hpp>
 #include <cmath>
+#include <filesystem>
+#include <string>
 
 template <typename T> int sign(T value) {
     if (value > T(0)) return 1;
@@ -29,4 +31,10 @@ template <typename T> T clamp(T value, T min, T max) {
     value = std::max(value, min);
     value = std::min(value, max);
     return value;
+}
+
+inline std::filesystem::path shader_path_from_argv0(const char* argv0, const std::string& filename) {
+    std::filesystem::path exe = std::filesystem::absolute(std::filesystem::path(argv0));
+    std::filesystem::path dir = exe.parent_path() / "shaders";
+    return dir / filename;
 }
