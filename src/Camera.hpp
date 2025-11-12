@@ -1,50 +1,51 @@
 #pragma once
-#include <glm/glm.hpp>
+#include "Vector.hpp"
+#include "Utils.hpp"
 
 class Camera {
 public:
-    Camera(float fov_deg, float aspect_ratio, float near_plane_dist, float far_plane_dist)
-        : projection(glm::perspective(
-            glm::radians(fov_deg),
+    Camera(double fov_deg, double aspect_ratio, double near_plane_dist, double far_plane_dist)
+        : projection(Transform::perspective(
+            utils::to_radians(fov_deg),
             aspect_ratio,
             near_plane_dist,
             far_plane_dist
     )) {}
     
-    glm::vec3 get_position() const {
+    Vector3 get_position() const {
         return position;
     }
-    void set_position(glm::vec3 pos) {
+    void set_position(Vector3 pos) {
         position = pos;
         view_dirty = true;
     }
-    void set_position(float x, float y, float z) {
-        set_position(glm::vec3(x, y, z));
+    void set_position(double x, double y, double z) {
+        set_position({x, y, z});
     }
 
-    float get_pitch() const {
-        return glm::degrees(pitch);
+    double get_pitch() const {
+        return utils::to_degrees(pitch);
     }
-    void set_pitch(float pitch_deg) {
-        pitch = glm::radians(pitch_deg);
+    void set_pitch(double pitch_deg) {
+        pitch = utils::to_radians(pitch_deg);
         view_dirty = true;
     }
 
-    float get_yaw() const {
-        return glm::degrees(yaw);
+    double get_yaw() const {
+        return utils::to_degrees(yaw);
     }
-    void set_yaw(float yaw_deg) {
-        yaw = glm::radians(yaw_deg);
+    void set_yaw(double yaw_deg) {
+        yaw = utils::to_radians(yaw_deg);
         view_dirty = true;
     }
 
-    const glm::mat4& get_view_matrix() const {
+    const Transform& get_view_matrix() const {
         if (view_dirty) {
             update_view_matrix();
         }
         return view;
     }
-    const glm::mat4& get_projection_matrix() const {
+    const Transform& get_projection_matrix() const {
         return projection;
     }
 
@@ -52,24 +53,23 @@ private:
     mutable bool view_dirty = true;
     // TODO: allow FOV and aspect changes
     
-    glm::vec3 position = glm::vec3(0.0f);
-    float yaw = 0.0f;
-    float pitch = 0.0f;
+    Vector3 position = Vector3(0.0);
+    double yaw = 0.0;
+    double pitch = 0.0;
     
-    mutable glm::mat4 view = glm::mat4(1.0f);
-    glm::mat4 projection;
+    mutable Transform view = Transform(1.0);
+    Transform projection;
 
     void update_view_matrix() const {
-        glm::vec3 front;
+        Vector3 front;
         front.x = cos(yaw) * cos(pitch);
         front.y = sin(pitch);
         front.z = sin(yaw) * cos(pitch);
-        front = glm::normalize(front);
+        front.normalize();
         
-        view = glm::lookAt(
+        view = look_at(
             position,
-            position + front,
-            glm::vec3(0.0f, 1.0f, 0.0f)  // UP
+            position + front
         );
         
         view_dirty = false;

@@ -7,10 +7,7 @@
 #include <glm/glm.hpp>
 #include <cmath>
 #include <numbers>
-
-constexpr double PI = 3.14159265358979323846;
-constexpr double DEG_TO_RAD = PI / 180.0;
-constexpr double RAD_TO_DEG = 180.0 / PI;
+#include "Utils.hpp"
 
 struct Vector2 {
     double x;
@@ -110,10 +107,10 @@ struct Vector2 {
     glm::vec2 to_glm() const {return {static_cast<float>(x), static_cast<float>(y)};};
 
     Vector2 to_radians() const {
-        return Vector2(x * DEG_TO_RAD, y * DEG_TO_RAD);
+        return Vector2(utils::to_radians(x), utils::to_radians(y));
     }
     Vector2 to_degrees() const {
-        return Vector2(x * RAD_TO_DEG, y * RAD_TO_DEG);
+        return Vector2(utils::to_degrees(x), utils::to_degrees(y));
     }
 };
 
@@ -231,10 +228,10 @@ struct Vector3 {
 
     glm::vec3 to_glm() const {return {static_cast<float>(x), static_cast<float>(y), static_cast<float>(z)};}
     Vector3 to_radians() const {
-        return Vector3(x * DEG_TO_RAD, y * DEG_TO_RAD, z * DEG_TO_RAD);
+        return Vector3(utils::to_radians(x), utils::to_radians(y), utils::to_radians(z));
     }
     Vector3 to_degrees() const {
-        return Vector3(x * RAD_TO_DEG, y * RAD_TO_DEG, z * RAD_TO_DEG);
+        return Vector3(utils::to_degrees(x), utils::to_degrees(y), utils::to_degrees(z));
     }
 };
 
@@ -345,10 +342,10 @@ struct Vector4 {
 
     glm::vec4 to_glm() const {return {static_cast<float>(r), static_cast<float>(g), static_cast<float>(b), static_cast<float>(a)};}
     Vector4 to_radians() const {
-        return Vector4(r * DEG_TO_RAD, g * DEG_TO_RAD, b * DEG_TO_RAD, a * DEG_TO_RAD);
+        return Vector4(utils::to_radians(r), utils::to_radians(g), utils::to_radians(b), utils::to_radians(a));
     }
     Vector4 to_degrees() const {
-        return Vector4(r * RAD_TO_DEG, g * RAD_TO_DEG, b * RAD_TO_DEG, a * RAD_TO_DEG);
+        return Vector4(utils::to_degrees(r), utils::to_degrees(g), utils::to_degrees(b), utils::to_degrees(a));
     }
 };
 

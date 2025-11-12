@@ -4,8 +4,12 @@
 
 #pragma once
 
-#include <glm/glm.hpp>
-#include <cmath>
+#include <algorithm>
+namespace utils
+{
+constexpr double PI = 3.14159265358979323846;
+constexpr double DEG_TO_RAD = PI / 180.0;
+constexpr double RAD_TO_DEG = 180.0 / PI;
 
 template <typename T> int sign(T value) {
     if (value > T(0)) return 1;
@@ -13,20 +17,19 @@ template <typename T> int sign(T value) {
     return 0;
 }
 
-inline float magnitude(const glm::vec2& vec) {
-    return std::sqrt(
-        (vec.x * vec.x) + (vec.y * vec.y)
-        );
-}
-
-inline float magnitude(const glm::vec3& vec) {
-    return std::sqrt(
-        (vec.x * vec.x) + (vec.y * vec.y) + (vec.z * vec.z)
-        );
-}
-
 template <typename T> T clamp(T value, T min, T max) {
     value = std::max(value, min);
     value = std::min(value, max);
     return value;
 }
+
+inline double to_degrees(double rad) {
+    return rad * RAD_TO_DEG;
+}
+
+inline double to_radians(double deg) {
+    return deg * DEG_TO_RAD;
+}
+} // namespace utils
+
+
