@@ -2,8 +2,6 @@
 #include <random>
 #include <OpenGL/gl3.h>
 #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include "Shader.hpp"
 #include "Mesh.hpp"
 #include "Camera.hpp"
@@ -11,6 +9,7 @@
 #include "Input.hpp"
 #include "Utils.hpp"
 #include "Vector.hpp"
+#include "ResourceManager.hpp"
 
 constexpr unsigned int W_WIDTH = 800;
 constexpr unsigned int W_HEIGHT = 600;
@@ -41,8 +40,12 @@ GLFWwindow* initWindow() {
 }
 
 int main(int argc, char** argv) {
+    // Singleton setup
+    Managers::initialize(utils::exe_dir_path_from_argv0(argv[0]));
+
     GLFWwindow* window = initWindow();
     Input input(window);
+
 
     std::vector<float> verts {
         // position      // RGB
@@ -65,11 +68,6 @@ int main(int argc, char** argv) {
         verts, idx
     );
 
-    Shader shader(
-        utils::shader_path_from_argv0(argv[0], "vertex.glsl").string(),
-        utils::shader_path_from_argv0(argv[0], "fragment.glsl").string()
-    );
-
     std::vector<GameObject> entities;
 
     std::random_device rd;
@@ -79,7 +77,7 @@ int main(int argc, char** argv) {
     std::uniform_int_distribution<> rand_z(-500, 1);
 
     for (int i=0; i < 500; i++) {
-        GameObject obj(&mesh, &shader);
+        GameObject obj(&mesh, "default");
         obj.set_position(
             Vector3(
                 rand_x(gen),
@@ -87,7 +85,7 @@ int main(int argc, char** argv) {
                 rand_z(gen)
             )
         );
-        entities.push_back(obj);
+        entities.push_back(std::move(obj));
 
     }
 

@@ -26,6 +26,11 @@ template <typename T> inline T clamp(T value, T min, T max) {
     return value;
 }
 
+inline std::filesystem::path exe_dir_path_from_argv0(const char* argv0) {
+    std::filesystem::path exe = std::filesystem::absolute(std::filesystem::path(argv0));
+    return exe.parent_path();
+}
+
 inline std::filesystem::path shader_path_from_argv0(const char* argv0, const std::string& filename) {
     std::filesystem::path exe = std::filesystem::absolute(std::filesystem::path(argv0));
     std::filesystem::path dir = exe.parent_path() / "shaders";

@@ -4,11 +4,61 @@
 #include "Mesh.hpp"
 #include "Shader.hpp"
 #include "Camera.hpp"
+#include "ResourceManager.hpp"
 
 class GameObject {
 public:
-    GameObject(Mesh* mesh, Shader* shader)
-        : mesh(mesh), shader(shader) {};
+    GameObject(Mesh* mesh, const std::string& shader_name)
+        : mesh(mesh), shader_name(shader_name) {
+        // TODO mesh handling
+        shader = Managers::shader_manager().get(shader_name);
+    };
+    ~GameObject() noexcept {
+        if (shader) {
+            // TODO mesh handling
+            Managers::shader_manager().release(shader_name);
+        }
+    }
+
+    // No copy
+    GameObject(const GameObject&) = delete;
+    GameObject& operator=(const GameObject&) = delete;
+
+    GameObject(GameObject&& other) noexcept
+        : mesh(other.mesh)
+        , shader(other.shader)
+        , shader_name(std::move(other.shader_name))
+        , velocity(other.velocity)
+        , position(other.position)
+        , scale(other.scale)
+        , rotation_rad(other.rotation_rad)
+        , transform(other.transform) {
+        other.shader = nullptr;
+        other.mesh = nullptr;
+        other.shader_name.clear();
+    }
+    GameObject& operator=(GameObject&& other) noexcept {
+        if (this != &other) {
+            // Release current resources
+            if (shader) {
+                // TODO mesh handling
+                Managers::shader_manager().release(shader_name);
+            }
+            mesh = other.mesh;
+            shader = other.shader;
+            shader_name = std::move(other.shader_name);
+            velocity = other.velocity;
+            position = other.position;
+            scale = other.scale;
+            rotation_rad = other.rotation_rad;
+            transform = other.transform;
+
+            other.shader = nullptr;
+            other.mesh = nullptr;
+            other.shader_name.clear();
+        }
+        return *this;
+    }
 
     void render(const Camera& camera) const;
 
@@ -81,6 +131,8 @@ public:
 private:
     Mesh* mesh;
     Shader* shader;
+
+    std::string shader_name;
 
     Vector3 velocity = Vector3(0.0);
     Vector3 position = Vector3(0.0);

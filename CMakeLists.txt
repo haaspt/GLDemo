@@ -46,6 +46,8 @@ add_executable(GLDemo src/main.cpp
         src/Utils.hpp
         src/Vector.cpp
         src/Vector.hpp
+        src/ResourceManager.hpp
+        src/ResourceManager.cpp
 )
 
 target_link_libraries(GLDemo
