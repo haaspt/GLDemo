@@ -6,7 +6,6 @@
 
 #include <glm/glm.hpp>
 #include <cmath>
-#include <numbers>
 #include "Utils.hpp"
 
 struct Vector2 {
