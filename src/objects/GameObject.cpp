@@ -1,4 +1,4 @@
-#include "GameObject.hpp"
+#include "objects/GameObject.hpp"
 
 void GameObject::render(const Camera& camera) const {
     shader->use();

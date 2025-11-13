@@ -14,6 +14,13 @@ constexpr double PI = 3.14159265358979323846;
 constexpr double DEG_TO_RAD = PI / 180.0;
 constexpr double RAD_TO_DEG = 180.0 / PI;
 
+class IdGen {
+private:
+    inline static unsigned int current_id = 0;
+public:
+    static unsigned int get_id() { return current_id++; }
+};
+
 template <typename T> inline int sign(T value) {
     if (value > T(0)) return 1;
     if (value < T(0)) return -1;

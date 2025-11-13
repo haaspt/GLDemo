@@ -1,4 +1,4 @@
-#include "Vector.hpp"
+#include "utilities/Vector.hpp"
 
 inline Vector3 Vector3::cross(const Vector3& other) const {
     return Vector3(

@@ -9,8 +9,8 @@
 #include <filesystem>
 #include <fstream>
 #include <nlohmann/json.hpp>
-#include "Shader.hpp"
-#include "Mesh.hpp"
+#include "resources/Shader.hpp"
+#include "resources/Mesh.hpp"
 
 using json = nlohmann::json;
 

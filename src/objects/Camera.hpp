@@ -1,6 +1,7 @@
 #pragma once
-#include "Vector.hpp"
-#include "Utils.hpp"
+
+#include "utilities/Vector.hpp"
+#include "utilities/Utils.hpp"
 
 class Camera {
 public:

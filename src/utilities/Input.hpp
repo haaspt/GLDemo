@@ -5,7 +5,7 @@
 #pragma once
 
 #include <GLFW/glfw3.h>
-#include "Vector.hpp"
+#include "utilities/Vector.hpp"
 
 
 class Input {

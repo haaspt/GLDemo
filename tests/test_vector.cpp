@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "Vector.hpp"
+#include "utilities/Vector.hpp"
 #include <cmath>
 
 // Test Vector2 basic operations

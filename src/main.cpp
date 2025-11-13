@@ -2,13 +2,12 @@
 #include <random>
 #include <OpenGL/gl3.h>
 #include <GLFW/glfw3.h>
-#include "Shader.hpp"
-#include "Camera.hpp"
-#include "GameObject.hpp"
-#include "Input.hpp"
-#include "Utils.hpp"
-#include "Vector.hpp"
-#include "ResourceManager.hpp"
+#include "objects/Camera.hpp"
+#include "objects/GameObject.hpp"
+#include "utilities/Input.hpp"
+#include "utilities/Utils.hpp"
+#include "utilities/Vector.hpp"
+#include "resources/ResourceManager.hpp"
 
 constexpr unsigned int W_WIDTH = 800;
 constexpr unsigned int W_HEIGHT = 600;

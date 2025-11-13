@@ -46,22 +46,22 @@ find_package(OpenGL REQUIRED)
 
 add_executable(GLDemo
   src/main.cpp
-  src/Mesh.cpp
-  src/Mesh.hpp
-  src/Shader.cpp
-  src/Shader.hpp
-  src/GameObject.cpp
-  src/GameObject.hpp
-  src/Camera.hpp
-  src/Input.cpp
-  src/Input.hpp
-  src/Utils.hpp
-  src/Vector.cpp
-  src/Vector.hpp
-  src/ResourceManager.cpp
-  src/ResourceManager.hpp
-  src/Node.cpp
-  src/Node.hpp
+  src/resources/Mesh.cpp
+  src/resources/Mesh.hpp
+  src/resources/Shader.cpp
+  src/resources/Shader.hpp
+  src/objects/GameObject.cpp
+  src/objects/GameObject.hpp
+  src/objects/Camera.hpp
+  src/utilities/Input.cpp
+  src/utilities/Input.hpp
+  src/utilities/Utils.hpp
+  src/utilities/Vector.cpp
+  src/utilities/Vector.hpp
+  src/resources/ResourceManager.cpp
+  src/resources/ResourceManager.hpp
+  src/objects/Node.cpp
+  src/objects/Node.hpp
 )
 
 target_include_directories(GLDemo PRIVATE ${CMAKE_SOURCE_DIR}/src)
@@ -83,9 +83,9 @@ enable_testing()
 add_executable(tests
   tests/test_vector.cpp
   tests/test_transform.cpp
-  src/Vector.cpp
-  src/Vector.hpp
-  src/Utils.hpp
+  src/utilities/Vector.cpp
+  src/utilities/Vector.hpp
+  src/utilities/Utils.hpp
 )
 
 target_include_directories(tests PRIVATE ${CMAKE_SOURCE_DIR}/src)

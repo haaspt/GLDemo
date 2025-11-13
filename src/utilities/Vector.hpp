@@ -6,7 +6,7 @@
 
 #include <glm/glm.hpp>
 #include <cmath>
-#include "Utils.hpp"
+#include "utilities/Utils.hpp"
 
 struct Vector2 {
     double x;

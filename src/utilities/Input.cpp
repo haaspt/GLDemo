@@ -2,7 +2,7 @@
 // Created by Patrick Haas on 11/10/25.
 //
 
-#include "Input.hpp"
+#include "utilities/Input.hpp"
 
 bool Input::initialized = false;
 GLFWwindow* Input::window;

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "Vector.hpp"
+#include "utilities/Vector.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <cmath>

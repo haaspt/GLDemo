@@ -1,4 +1,4 @@
-#include "Mesh.hpp"
+#include "resources/Mesh.hpp"
 
 Mesh::MeshData Mesh::get_mesh_data(const json& j_data) const {
     MeshData new_data{

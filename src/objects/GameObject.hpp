@@ -1,10 +1,10 @@
 #pragma once
 #include <string>
-#include "Node.hpp"
-#include "Mesh.hpp"
-#include "Shader.hpp"
-#include "Camera.hpp"
-#include "ResourceManager.hpp"
+#include "objects/Node.hpp"
+#include "resources/Mesh.hpp"
+#include "resources/Shader.hpp"
+#include "objects/Camera.hpp"
+#include "resources/ResourceManager.hpp"
 
 class GameObject : public Node {
 private:

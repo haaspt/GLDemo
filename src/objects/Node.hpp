@@ -1,20 +1,33 @@
 #pragma once
 
-#include <vector>
-#include "Vector.hpp"
+#include <unordered_map>
+#include "utilities/Vector.hpp"
+#include "utilities/Utils.hpp"
 
 class Node {
 private:
+    unsigned int id;
+
     Vector3 velocity = Vector3(0.0);
     Vector3 position = Vector3(0.0);
     Vector3 scale = Vector3(1.0);
     Vector3 rotation_rad = Vector3(0.0);
 
-    Transform transform = Transform(1.0);
+    mutable Transform transform = Transform(1.0);
+    mutable bool is_transform_dirty = false;
 
-    void update_transform();
+    void update_transform() const;
 protected:
-    const Transform& get_transform() const {return transform;}
+    Node* parent_node = nullptr;
+    std::unordered_map<unsigned int, Node*> child_nodes = {};
+
+    void add_parent(Node* parent_ptr);
+    void reparent(Node* new_parent_ptr);
+    void add_child(Node* child_ptr);
+    void remove_child(unsigned int child_id);
+
+    const Transform& get_transform() const;
+    void set_dirty_flag() const {is_transform_dirty = true;}
 
     virtual void process(double const/*delta_t*/) {}
 
@@ -25,8 +38,10 @@ protected:
     Node& operator=(Node&&) noexcept = default;
     
 public:
-    Node() = default;
+    Node() : id(utils::IdGen::get_id()) {}
     virtual ~Node() noexcept = default;
+
+    unsigned int get_id() const {return id;}
 
     void update(double delta_t);
 
@@ -36,6 +51,7 @@ public:
 
     void set_velocity(Vector3 vel) {
         velocity = vel;
+        set_dirty_flag();
     }
 
     void set_velocity(double const x_vel, double const y_vel, double const z_vel) {
@@ -47,6 +63,7 @@ public:
     }
     void set_position(Vector3 const pos) {
         position = pos;
+        set_dirty_flag();
     }
     void set_position(double const x, double const y, double const z) {
         set_position({x, y, z});
@@ -57,6 +74,7 @@ public:
     }
     void set_scale(Vector3 scl) {
         scale = scl;
+        set_dirty_flag();
     }
     void set_scale(double const x, double const y, double const z) {
         set_scale({x, y, z});
@@ -67,6 +85,7 @@ public:
     }
     void set_rotation_rad(Vector3 rot_rad) {
         rotation_rad = rot_rad;
+        set_dirty_flag();
     }
     void set_rotation_rad(double const x_rad, double const y_rad, double const z_rad) {
         set_rotation_rad({x_rad, y_rad, z_rad});
@@ -83,6 +102,7 @@ public:
 
     void rotate_rad(const Vector3& rot_rad) {
         rotation_rad += rot_rad;
+        set_dirty_flag();
     }
     void rotate_rad(double const x_rad, double const y_rad, double const z_rad) {
         rotate_rad({x_rad, y_rad, z_rad});
