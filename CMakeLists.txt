@@ -23,14 +23,15 @@ FetchContent_Declare(
         GIT_TAG 1.0.1
 )
 
-# Google Test
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz)
+
 FetchContent_Declare(
         googletest
         GIT_REPOSITORY https://github.com/google/googletest.git
         GIT_TAG v1.14.0
 )
 
-FetchContent_MakeAvailable(glfw glm googletest)
+FetchContent_MakeAvailable(glfw glm json googletest)
 
 add_executable(GLDemo src/main.cpp
         src/Mesh.cpp
@@ -54,6 +55,7 @@ target_link_libraries(GLDemo
         glfw
         glm::glm
         "-framework OpenGL"
+        nlohmann_json::nlohmann_json
 )
 
 # Enable testing
@@ -85,3 +87,9 @@ add_custom_command(TARGET GLDemo POST_BUILD
           ${CMAKE_CURRENT_SOURCE_DIR}/src/shaders
           $<TARGET_FILE_DIR:GLDemo>/shaders
   COMMENT "Copying shaders to runtime directory")
+
+add_custom_command(TARGET GLDemo POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/models
+        $<TARGET_FILE_DIR:GLDemo>/models
+        COMMENT "Copying models to runtime directory")

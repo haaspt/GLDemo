@@ -1,8 +1,20 @@
 #include "Mesh.hpp"
 
-Mesh::Mesh(const std::vector<float>& verts, const std::vector<int>& idxs)
-    : index_count(idxs.size())
-{
+Mesh::MeshData Mesh::get_mesh_data(const json& j_data) const {
+    MeshData new_data{
+        j_data["vertices"].get<std::vector<float>>(),
+        j_data["indices"].get<std::vector<int>>(),
+        j_data["name"]
+        };
+    return new_data;
+}
+
+Mesh::Mesh(const json& json_data) :
+    mesh_data(get_mesh_data(json_data)), index_count(mesh_data.indices.size()) {
+    gl_init();
+}
+
+void Mesh::gl_init() {
     // VAO setup
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -14,8 +26,8 @@ Mesh::Mesh(const std::vector<float>& verts, const std::vector<int>& idxs)
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(
         GL_ARRAY_BUFFER,
-        verts.size() * sizeof(float),
-        verts.data(),
+        mesh_data.vertices.size() * sizeof(float),
+        mesh_data.vertices.data(),
         GL_STATIC_DRAW
     );
 
@@ -23,7 +35,7 @@ Mesh::Mesh(const std::vector<float>& verts, const std::vector<int>& idxs)
     glBufferData(
         GL_ELEMENT_ARRAY_BUFFER,
         index_count * sizeof(int),
-        idxs.data(),
+        mesh_data.indices.data(),
         GL_STATIC_DRAW
     );
 

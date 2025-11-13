@@ -3,7 +3,6 @@
 #include <OpenGL/gl3.h>
 #include <GLFW/glfw3.h>
 #include "Shader.hpp"
-#include "Mesh.hpp"
 #include "Camera.hpp"
 #include "GameObject.hpp"
 #include "Input.hpp"
@@ -40,34 +39,19 @@ GLFWwindow* initWindow() {
 }
 
 int main(int argc, char** argv) {
+    // Window setup
+    GLFWwindow* window = initWindow();
+
     // Singleton setup
     Managers::initialize(utils::exe_dir_path_from_argv0(argv[0]));
-
-    GLFWwindow* window = initWindow();
     Input::initialize(window);
 
+    // Camera Setup
+    Camera camera(55.0, static_cast<double>(W_WIDTH) / W_HEIGHT, 0.1, 500.0);
+    camera.set_position(0.0, 0.0, -3.0);
+    camera.set_yaw(-90);
 
-    std::vector<float> verts {
-        // position      // RGB
-        -0.5, -0.5,  0.5,  0.5, 1.0, 1.0,  // base vertex 0
-         0.5, -0.5,  0.5,  1.0, 0.5, 1.0,  // base vertex 1
-         0.5, -0.5, -0.5,  1.0, 1.0, 0.5,  // base vertex 2
-        -0.5, -0.5, -0.5,  0.5, 1.0, 1.0,  // base vertex 3
-         0.0,  0.5,  0.0,  1.0, 1.0, 1.0,  // apex vertex 4
-    };
-    std::vector<int> idx {
-        0, 1, 4,  // front face
-        1, 2, 4,  // right face
-        2, 3, 4,  // back face
-        3, 0, 4,  // left face
-        0, 2, 1,  // base triangle 1
-        0, 3, 2   // base triangle 2
-    };
-
-    Mesh mesh(
-        verts, idx
-    );
-
+    // World setup
     std::vector<GameObject> entities;
 
     std::random_device rd;
@@ -77,7 +61,7 @@ int main(int argc, char** argv) {
     std::uniform_int_distribution<> rand_z(-500, 1);
 
     for (int i=0; i < 500; i++) {
-        GameObject obj(&mesh, "default");
+        GameObject obj("pyramid", "default");
         obj.set_position(
             Vector3(
                 rand_x(gen),
@@ -88,11 +72,6 @@ int main(int argc, char** argv) {
         entities.push_back(std::move(obj));
 
     }
-
-    Camera camera(55.0, static_cast<double>(W_WIDTH) / W_HEIGHT, 0.1, 500.0);
-    camera.set_position(0.0, 0.0, -3.0);
-    camera.set_yaw(-90);
-
     
     double delta_t = 0.0;
     double last = glfwGetTime();
@@ -110,11 +89,15 @@ int main(int argc, char** argv) {
     Vector3 velocity_vector{0.0, 0.0, warp_speed};
     Vector3 accel_vector{0.0};
     
+    // Main loop
     while (!glfwWindowShouldClose(window)) {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         now = glfwGetTime();
         delta_t = now - last;
         last = now;
 
+        // Input handling
         accel_vector = Input::get_input_vec();
 
         if (delta_t > 0) {
@@ -141,8 +124,6 @@ int main(int argc, char** argv) {
             velocity_vector.y = utils::clamp(velocity_vector.y, -max_lateral_speed, max_lateral_speed);
             velocity_vector.z = utils::clamp(velocity_vector.z, 0.0, max_warp_speed);
         }
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         for (auto& object : entities) {
             object.set_velocity(velocity_vector);
@@ -175,6 +156,7 @@ int main(int argc, char** argv) {
                 pos.y = WORLD_BOUND_Y;
                 object.set_position(pos);
             }
+            
             Vector3 rot{1.0};
             rot *= (60.0 * delta_t);
             object.rotate_deg(rot);

@@ -7,7 +7,12 @@
 #include <unordered_map>
 #include <string>
 #include <filesystem>
+#include <fstream>
+#include <nlohmann/json.hpp>
 #include "Shader.hpp"
+#include "Mesh.hpp"
+
+using json = nlohmann::json;
 
 template<class Resource, class Loader>
 class ResourceManager {
@@ -50,7 +55,7 @@ struct ShaderLoader {
 
     explicit ShaderLoader(const std::string& shader_dir) : shader_dir(shader_dir) {};
 
-    Shader* load(const std::string& shader_name) {
+    Shader* load(const std::string& shader_name) const {
         const auto vertex_shader_path = shader_dir / (shader_name + ".vert");
         const auto fragment_shader_path = shader_dir / (shader_name + ".frag");
 
@@ -66,7 +71,28 @@ struct ShaderLoader {
     }
 };
 
+struct MeshLoader {
+    const std::filesystem::path model_dir;
+
+    explicit MeshLoader(const std::string& model_dir) : model_dir(model_dir) {};
+
+    Mesh* load(const std::string& model_name) {
+        const auto model_json_path = model_dir / (model_name + ".json");
+
+        std::ifstream file(model_json_path);
+        json json_data = json::parse(file);
+
+        Mesh* new_mesh = new Mesh(json_data);
+        return new_mesh;
+    }
+
+    void unload(Mesh* mesh) noexcept {
+        delete mesh;
+    }
+};
+
 using ShaderManager = ResourceManager<Shader, ShaderLoader>;
+using MeshManager = ResourceManager<Mesh, MeshLoader>;
 
 class Managers {
 private:
@@ -83,6 +109,14 @@ public:
             throw std::runtime_error("Managers not initialized! Call Managers::initialize() first.");
         }
         static ShaderManager instance(ShaderLoader(exe_dir_path / "shaders"));
+        return instance;
+    }
+
+    static MeshManager& mesh_manager() {
+        if (!initialized) {
+            throw std::runtime_error("Managers not initialized! Call Managers::initialize() first.");
+        }
+        static MeshManager instance(MeshLoader(exe_dir_path / "models"));
         return instance;
     }
 };

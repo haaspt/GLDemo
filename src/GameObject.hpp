@@ -8,14 +8,16 @@
 
 class GameObject {
 public:
-    GameObject(Mesh* mesh, const std::string& shader_name)
-        : mesh(mesh), shader_name(shader_name) {
-        // TODO mesh handling
+    GameObject(const std::string& model_name, const std::string& shader_name)
+        : model_name(model_name), shader_name(shader_name) {
+        mesh = Managers::mesh_manager().get(model_name);
         shader = Managers::shader_manager().get(shader_name);
     };
     ~GameObject() noexcept {
+        if (mesh) {
+            Managers::mesh_manager().release(model_name);
+        }
         if (shader) {
-            // TODO mesh handling
             Managers::shader_manager().release(shader_name);
         }
     }
@@ -27,6 +29,7 @@ public:
     GameObject(GameObject&& other) noexcept
         : mesh(other.mesh)
         , shader(other.shader)
+        , model_name(std::move(other.model_name))
         , shader_name(std::move(other.shader_name))
         , velocity(other.velocity)
         , position(other.position)
@@ -35,17 +38,20 @@ public:
         , transform(other.transform) {
         other.shader = nullptr;
         other.mesh = nullptr;
+        other.model_name.clear();
         other.shader_name.clear();
     }
     GameObject& operator=(GameObject&& other) noexcept {
         if (this != &other) {
-            // Release current resources
+            if (mesh) {
+                Managers::mesh_manager().release(model_name);
+            }
             if (shader) {
-                // TODO mesh handling
                 Managers::shader_manager().release(shader_name);
             }
             mesh = other.mesh;
             shader = other.shader;
+            model_name = std::move(other.model_name);
             shader_name = std::move(other.shader_name);
             velocity = other.velocity;
             position = other.position;
@@ -55,6 +61,7 @@ public:
 
             other.shader = nullptr;
             other.mesh = nullptr;
+            other.model_name.clear();
             other.shader_name.clear();
         }
         return *this;
@@ -132,6 +139,7 @@ private:
     Mesh* mesh;
     Shader* shader;
 
+    std::string model_name;
     std::string shader_name;
 
     Vector3 velocity = Vector3(0.0);
