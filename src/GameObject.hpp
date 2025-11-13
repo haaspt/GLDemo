@@ -33,7 +33,8 @@ public:
     GameObject& operator=(const GameObject&) = delete;
 
     GameObject(GameObject&& other) noexcept
-        : mesh(other.mesh),
+        : Node(std::move(other)),
+          mesh(other.mesh),
           shader(other.shader),
           model_name(std::move(other.model_name)),
           shader_name(std::move(other.shader_name)) {
