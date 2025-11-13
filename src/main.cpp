@@ -38,7 +38,7 @@ GLFWwindow* initWindow() {
     return window;
 }
 
-int main(int argc, char** argv) {
+int main(int /*argc*/, char** argv) {
     // Window setup
     GLFWwindow* window = initWindow();
 
