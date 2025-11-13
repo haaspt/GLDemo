@@ -58,8 +58,10 @@ add_executable(GLDemo
   src/Utils.hpp
   src/Vector.cpp
   src/Vector.hpp
-  src/ResourceManager.hpp
   src/ResourceManager.cpp
+  src/ResourceManager.hpp
+  src/Node.cpp
+  src/Node.hpp
 )
 
 target_include_directories(GLDemo PRIVATE ${CMAKE_SOURCE_DIR}/src)
