@@ -19,7 +19,7 @@ private:
     std::unordered_map<std::string, Entry> resources = {};
     Loader loader;
 public:
-    ResourceManager(Loader loader) : loader(loader) {};
+    explicit ResourceManager(Loader loader) : loader(std::move(loader)) {};
 
     Resource* get(const std::string& name) {
         auto it = resources.find(name);
