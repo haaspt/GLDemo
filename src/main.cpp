@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
     Managers::initialize(utils::exe_dir_path_from_argv0(argv[0]));
 
     GLFWwindow* window = initWindow();
-    Input input(window);
+    Input::initialize(window);
 
 
     std::vector<float> verts {
@@ -115,7 +115,7 @@ int main(int argc, char** argv) {
         delta_t = now - last;
         last = now;
 
-        accel_vector = input.get_input_vec();
+        accel_vector = Input::get_input_vec();
 
         if (delta_t > 0) {
             accel_vector.x *= lateral_accel;

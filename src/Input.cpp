@@ -4,7 +4,13 @@
 
 #include "Input.hpp"
 
-Vector3 Input::get_input_vec() const {
+bool Input::initialized = false;
+GLFWwindow* Input::window;
+
+Vector3 Input::get_input_vec() {
+    if (!initialized) {
+        throw std::runtime_error("Input not initialized! Call Input::initialize() first.");
+    }
     Vector3 input_vector = Vector3::ZERO();
     int key_state = glfwGetKey(window, GLFW_KEY_W);
     if (key_state == GLFW_PRESS) {

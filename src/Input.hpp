@@ -10,10 +10,14 @@
 
 class Input {
 public:
-    explicit Input(GLFWwindow* window) : window(window) {}
+    static void initialize(GLFWwindow* glfw_window) {
+        Input::window = glfw_window;
+        initialized = true;
+    }
 
-    Vector3 get_input_vec() const;
+    static Vector3 get_input_vec();
 
 private:
-    GLFWwindow* window;
+    static bool initialized;
+    static GLFWwindow* window;
 };
