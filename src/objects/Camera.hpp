@@ -7,7 +7,7 @@ class Camera {
 public:
     Camera(double fov_deg, double aspect_ratio, double near_plane_dist, double far_plane_dist)
         : projection(Transform::perspective(
-            utils::to_radians(fov_deg),
+            Utils::to_radians(fov_deg),
             aspect_ratio,
             near_plane_dist,
             far_plane_dist
@@ -25,18 +25,18 @@ public:
     }
 
     double get_pitch() const {
-        return utils::to_degrees(pitch);
+        return Utils::to_degrees(pitch);
     }
     void set_pitch(double pitch_deg) {
-        pitch = utils::to_radians(pitch_deg);
+        pitch = Utils::to_radians(pitch_deg);
         view_dirty = true;
     }
 
     double get_yaw() const {
-        return utils::to_degrees(yaw);
+        return Utils::to_degrees(yaw);
     }
     void set_yaw(double yaw_deg) {
-        yaw = utils::to_radians(yaw_deg);
+        yaw = Utils::to_radians(yaw_deg);
         view_dirty = true;
     }
 

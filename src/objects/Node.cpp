@@ -25,7 +25,7 @@ void Node::update_transform() const {
 }
 
 void Node::update(double const delta_t) {
+    process(delta_t);
     position += velocity * delta_t;
     set_dirty_flag();
-    process(delta_t);
 }

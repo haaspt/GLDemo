@@ -62,6 +62,9 @@ add_executable(GLDemo
   src/resources/ResourceManager.hpp
   src/objects/Node.cpp
   src/objects/Node.hpp
+        src/game/Pyramid.cpp
+        src/game/Pyramid.hpp
+        src/game/Globals.hpp
 )
 
 target_include_directories(GLDemo PRIVATE ${CMAKE_SOURCE_DIR}/src)
@@ -104,14 +107,14 @@ gtest_discover_tests(tests)
 # --- Runtime assets ---
 add_custom_command(TARGET GLDemo POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory
-          ${CMAKE_CURRENT_SOURCE_DIR}/src/shaders
+        ${CMAKE_SOURCE_DIR}/src/game/shaders
           $<TARGET_FILE_DIR:GLDemo>/shaders
   COMMENT "Copying shaders to runtime directory"
 )
 
 add_custom_command(TARGET GLDemo POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory
-          ${CMAKE_CURRENT_SOURCE_DIR}/src/models
+        ${CMAKE_SOURCE_DIR}/src/game/models
           $<TARGET_FILE_DIR:GLDemo>/models
   COMMENT "Copying models to runtime directory"
 )

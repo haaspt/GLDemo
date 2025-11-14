@@ -7,8 +7,9 @@
 #include <filesystem>
 #include <string>
 #include <algorithm>
+#include <random>
 
-namespace utils
+namespace Utils
 {
 constexpr double PI = 3.14159265358979323846;
 constexpr double DEG_TO_RAD = PI / 180.0;
@@ -50,6 +51,23 @@ inline double to_degrees(double rad) {
 inline double to_radians(double deg) {
     return deg * DEG_TO_RAD;
 }
+
+class Random {
+public:
+    static float range(float min, float max) {
+        static std::random_device rd;
+        static std::mt19937 gen(rd());
+        std::uniform_real_distribution<float> dist(min, max);
+        return dist(gen);
+    }
+
+    static int range(int min, int max) {
+        static std::random_device rd;
+        static std::mt19937 gen(rd());
+        std::uniform_int_distribution<int> dist(min, max);
+        return dist(gen);
+    }
+};
 } // namespace utils
 
 

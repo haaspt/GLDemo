@@ -8,16 +8,16 @@ class Node {
 private:
     unsigned int id;
 
-    Vector3 velocity = Vector3(0.0);
-    Vector3 position = Vector3(0.0);
-    Vector3 scale = Vector3(1.0);
-    Vector3 rotation_rad = Vector3(0.0);
-
     mutable Transform transform = Transform(1.0);
     mutable bool is_transform_dirty = false;
 
     void update_transform() const;
 protected:
+    Vector3 velocity = Vector3(0.0);
+    Vector3 position = Vector3(0.0);
+    Vector3 scale = Vector3(1.0);
+    Vector3 rotation_rad = Vector3(0.0);
+
     Node* parent_node = nullptr;
     std::unordered_map<unsigned int, Node*> child_nodes = {};
 
@@ -38,7 +38,7 @@ protected:
     Node& operator=(Node&&) noexcept = default;
     
 public:
-    Node() : id(utils::IdGen::get_id()) {}
+    Node() : id(Utils::IdGen::get_id()) {}
     virtual ~Node() noexcept = default;
 
     unsigned int get_id() const {return id;}

@@ -106,10 +106,10 @@ struct Vector2 {
     glm::vec2 to_glm() const {return {static_cast<float>(x), static_cast<float>(y)};};
 
     Vector2 to_radians() const {
-        return Vector2(utils::to_radians(x), utils::to_radians(y));
+        return Vector2(Utils::to_radians(x), Utils::to_radians(y));
     }
     Vector2 to_degrees() const {
-        return Vector2(utils::to_degrees(x), utils::to_degrees(y));
+        return Vector2(Utils::to_degrees(x), Utils::to_degrees(y));
     }
 };
 
@@ -227,10 +227,10 @@ struct Vector3 {
 
     glm::vec3 to_glm() const {return {static_cast<float>(x), static_cast<float>(y), static_cast<float>(z)};}
     Vector3 to_radians() const {
-        return Vector3(utils::to_radians(x), utils::to_radians(y), utils::to_radians(z));
+        return Vector3(Utils::to_radians(x), Utils::to_radians(y), Utils::to_radians(z));
     }
     Vector3 to_degrees() const {
-        return Vector3(utils::to_degrees(x), utils::to_degrees(y), utils::to_degrees(z));
+        return Vector3(Utils::to_degrees(x), Utils::to_degrees(y), Utils::to_degrees(z));
     }
 };
 
@@ -341,10 +341,10 @@ struct Vector4 {
 
     glm::vec4 to_glm() const {return {static_cast<float>(r), static_cast<float>(g), static_cast<float>(b), static_cast<float>(a)};}
     Vector4 to_radians() const {
-        return Vector4(utils::to_radians(r), utils::to_radians(g), utils::to_radians(b), utils::to_radians(a));
+        return Vector4(Utils::to_radians(r), Utils::to_radians(g), Utils::to_radians(b), Utils::to_radians(a));
     }
     Vector4 to_degrees() const {
-        return Vector4(utils::to_degrees(r), utils::to_degrees(g), utils::to_degrees(b), utils::to_degrees(a));
+        return Vector4(Utils::to_degrees(r), Utils::to_degrees(g), Utils::to_degrees(b), Utils::to_degrees(a));
     }
 };
 
