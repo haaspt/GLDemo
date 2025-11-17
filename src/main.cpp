@@ -1,18 +1,28 @@
 #include <vector>
 #include <memory>
+#include <thread>
+#include <chrono>
+
 #include <OpenGL/gl3.h>
 #include <GLFW/glfw3.h>
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+
 #include "objects/Camera.hpp"
 #include "objects/GameObject.hpp"
 #include "utilities/Utils.hpp"
+#include "utilities/Input.hpp"
 #include "utilities/Vector.hpp"
 #include "resources/ResourceManager.hpp"
 
-#include "game/Globals.hpp"
-#include "game/Pyramid.hpp"
+#include "game/Cube.hpp"
 
 constexpr unsigned int W_WIDTH = 800;
 constexpr unsigned int W_HEIGHT = 600;
+
+constexpr double TARGET_FPS = 120;
+constexpr double FRAME_DURATION_MS = 1.0 / TARGET_FPS * 1000.0;
 
 
 GLFWwindow* initWindow() {
@@ -24,7 +34,7 @@ GLFWwindow* initWindow() {
     GLFWwindow* window = glfwCreateWindow(W_WIDTH, W_HEIGHT, "OpenGL Demo", nullptr, nullptr);
 
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
+    glfwSwapInterval(0);
 
     // TODO set keyboard and resize callbacks
 
@@ -34,6 +44,19 @@ GLFWwindow* initWindow() {
     glfwSetWindowAspectRatio(window, W_WIDTH, W_HEIGHT);
 
     glEnable(GL_DEPTH_TEST);
+
+    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
+    // ImGUI setup
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init();
+
     return window;
 }
 
@@ -47,47 +70,99 @@ int main(int /*argc*/, char** argv) {
 
     // Camera Setup
     Camera camera(55.0, static_cast<double>(W_WIDTH) / W_HEIGHT, 0.1, 500.0);
-    camera.set_position(0.0, 0.0, -3.0);
-    camera.set_yaw(-90);
+    camera.set_position(0.25, 1.25, -3.0);
+    camera.set_pitch(-25);
+    camera.set_yaw(90);
 
     // World setup
     std::vector<std::unique_ptr<GameObject>> entities;
 
-    for (int i=0; i < 500; i++) {
-        auto pyramid = std::make_unique<Pyramid>();
-        pyramid->set_position(
-            Vector3(
-            Utils::Random::range(-Globals::WORLD_BOUND_X, Globals::WORLD_BOUND_X),
-            Utils::Random::range(-Globals::WORLD_BOUND_Y, Globals::WORLD_BOUND_Y),
-            Utils::Random::range(-500, 1)
-            )
-        );
-        pyramid->set_velocity(0.0, 0.0, 500.0);
 
-        entities.push_back(std::move(pyramid));
+    auto cube = std::make_unique<Cube>();
+    cube->set_position(0, 0, 0);
+    entities.push_back(std::move(cube));
 
-    }
     
     double delta_t = 0.0;
     double last = glfwGetTime();
     double now = 0.0;
+    double this_frame_duration_ms = 0.0;
+    double time_to_next_frame_ms = 0.0;
+
+    Utils::CircularBuffer fps_history(100);
     
     // Main loop
     while (!glfwWindowShouldClose(window)) {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         now = glfwGetTime();
         delta_t = now - last;
         last = now;
 
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glfwPollEvents();
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        fps_history.push(1.0f / delta_t);
+
+        ImGui::Text("Mean FPS: %.1f", fps_history.average_value(20));
+        ImGui::Text("Min FPS: %.1f", fps_history.min_value(20));
+        ImGui::PlotLines("FPS", fps_history.buffer(), fps_history.size(),
+                 0, nullptr, 60.0f, 120.0f, ImVec2(0, 80));
+        ImGui::Separator();
+
+
+
+        ImGui::Text("Camera;  x: %.2f, y:%.2f, z: %.2f,\n\t pitch:%.2f, yaw:%.2f",
+            camera.get_position().x,
+            camera.get_position().y,
+            camera.get_position().z,
+            camera.get_pitch(),
+            camera.get_yaw()
+        );
+
+        ImGui::Separator();
+
+        ImGui::Text("World Objects:");
+        ImGui::BeginChild("Scrolling");
         for (const auto& object : entities) {
+            ImGui::BulletText("Object: %d; x: %.2f, y:%.2f, z: %.2f\n\t rx:%.2f, ry:%.2f, rz:%.2f",
+                object->get_id(),
+                object->get_position().x,
+                object->get_position().y,
+                object->get_position().z,
+                object->get_rotation_deg().x,
+                object->get_rotation_deg().y,
+                object->get_rotation_deg().z
+                );
+
+            object->rotate_deg({
+            0.0,
+            45.0 * delta_t,
+            0.0});
             object->update(delta_t);
             object->render(camera);
         }
+        ImGui::EndChild();
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
-        glfwPollEvents();
+
+        this_frame_duration_ms = (glfwGetTime() - now) * 1000.0;
+        time_to_next_frame_ms = FRAME_DURATION_MS - this_frame_duration_ms;
+        if (time_to_next_frame_ms > 0.0) {
+            std::this_thread::sleep_for(
+                std::chrono::microseconds(static_cast<long>(time_to_next_frame_ms * 1000.0))
+            );
+        }
     }
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
     return 0;
 }

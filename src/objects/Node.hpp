@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+
 #include "utilities/Vector.hpp"
 #include "utilities/Utils.hpp"
 
@@ -84,7 +85,11 @@ public:
         return rotation_rad;
     }
     void set_rotation_rad(Vector3 rot_rad) {
-        rotation_rad = rot_rad;
+        rotation_rad = {
+            Utils::wrap_radians(rot_rad.x),
+            Utils::wrap_radians(rot_rad.y),
+            Utils::wrap_radians(rot_rad.z)
+        };
         set_dirty_flag();
     }
     void set_rotation_rad(double const x_rad, double const y_rad, double const z_rad) {
@@ -101,7 +106,9 @@ public:
     }
 
     void rotate_rad(const Vector3& rot_rad) {
-        rotation_rad += rot_rad;
+        rotation_rad.x = Utils::wrap_radians(rotation_rad.x + rot_rad.x);
+        rotation_rad.y = Utils::wrap_radians(rotation_rad.y + rot_rad.y);
+        rotation_rad.z = Utils::wrap_radians(rotation_rad.z + rot_rad.z);
         set_dirty_flag();
     }
     void rotate_rad(double const x_rad, double const y_rad, double const z_rad) {

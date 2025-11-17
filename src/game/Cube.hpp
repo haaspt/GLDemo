@@ -1,19 +1,15 @@
 //
-// Created by Patrick Haas on 11/14/25.
+// Created by Patrick Haas on 11/15/25.
 //
 
 #pragma once
 
 #include "objects/GameObject.hpp"
 #include "utilities/Vector.hpp"
-#include "utilities/Input.hpp"
-#include "utilities/Utils.hpp"
 
-#include "game/Globals.hpp"
-
-class Pyramid : public GameObject {
+class Cube : public GameObject {
 public:
-    Pyramid() : GameObject("pyramid", "default") {}
+    Cube() : GameObject("cube", "default") {}
 
     const double max_warp_speed = 1000;
     const double max_lateral_speed = 450;
@@ -26,6 +22,6 @@ public:
 
     Vector3 accel_vector{0.0};
 
-    void process(double const delta_t) override;
+    void process(double const delta_t) override {};
 
 };

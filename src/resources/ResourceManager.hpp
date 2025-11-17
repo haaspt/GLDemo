@@ -8,7 +8,9 @@
 #include <string>
 #include <filesystem>
 #include <fstream>
+
 #include <nlohmann/json.hpp>
+
 #include "resources/Shader.hpp"
 #include "resources/Mesh.hpp"
 

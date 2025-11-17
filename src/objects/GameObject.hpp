@@ -1,9 +1,11 @@
 #pragma once
+
 #include <string>
+
 #include "objects/Node.hpp"
+#include "objects/Camera.hpp"
 #include "resources/Mesh.hpp"
 #include "resources/Shader.hpp"
-#include "objects/Camera.hpp"
 #include "resources/ResourceManager.hpp"
 
 class GameObject : public Node {

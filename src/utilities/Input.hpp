@@ -5,6 +5,7 @@
 #pragma once
 
 #include <GLFW/glfw3.h>
+
 #include "utilities/Vector.hpp"
 
 

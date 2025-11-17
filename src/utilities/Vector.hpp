@@ -4,9 +4,12 @@
 
 #pragma once
 
-#include <glm/glm.hpp>
 #include <cmath>
+
+#include <glm/glm.hpp>
+
 #include "utilities/Utils.hpp"
+
 
 struct Vector2 {
     double x;

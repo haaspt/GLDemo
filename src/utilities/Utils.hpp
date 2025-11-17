@@ -8,6 +8,8 @@
 #include <string>
 #include <algorithm>
 #include <random>
+#include <cmath>
+
 
 namespace Utils
 {
@@ -21,6 +23,54 @@ private:
 public:
     static unsigned int get_id() { return current_id++; }
 };
+
+class CircularBuffer {
+    private:
+        std::vector<float> data;
+        size_t index = 0;
+        bool filled = false;
+
+    public:
+        explicit CircularBuffer(size_t size) : data(size, 0.0f) {}
+
+        void push(float value) {
+            data[index] = value;
+            index = (index + 1) % data.size();
+            if (index == 0) filled = true;
+        }
+
+        float average_value(size_t last_n = 5) const {
+                size_t actual_size = filled ? data.size() : index;
+                if (actual_size == 0) return 0.0f;
+
+                last_n = std::min(last_n, actual_size);
+
+                float sum = 0.0f;
+                for (size_t i = 0; i < last_n; i++) {
+                    size_t idx = (index - 1 - i + data.size()) % data.size();
+                    sum += data[idx];
+                }
+
+                return sum / static_cast<float>(last_n);
+            }
+
+        float min_value(size_t last_n = 5) const {
+            size_t actual_size = filled ? data.size() : index;
+            if (actual_size == 0) return 0.0f;
+
+            last_n = std::min(last_n, actual_size);
+
+            float min = data[index];
+            for (size_t i = 1; i < last_n ; i++) {
+                size_t idx = (index - 1 - i + data.size()) % data.size();
+                min = std::min(min,data[idx]);
+            }
+            return min;
+        }
+
+        float* buffer() { return data.data(); }
+        size_t size() const { return filled ? data.size() : index; }
+    };
 
 template <typename T> inline int sign(T value) {
     if (value > T(0)) return 1;
@@ -50,6 +100,11 @@ inline double to_degrees(double rad) {
 
 inline double to_radians(double deg) {
     return deg * DEG_TO_RAD;
+}
+
+inline double wrap_radians(double rad) {
+    double wrapped = std::fmod(rad, PI * 2);
+    return wrapped < 0.0 ? wrapped + (PI * 2) : wrapped;
 }
 
 class Random {

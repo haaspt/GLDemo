@@ -34,12 +34,41 @@ FetchContent_Declare(json
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
 
+FetchContent_Declare(imgui
+  GIT_REPOSITORY https://github.com/ocornut/imgui.git
+  GIT_TAG v1.91.5
+)
+
 FetchContent_Declare(googletest
   GIT_REPOSITORY https://github.com/google/googletest.git
   GIT_TAG v1.14.0
 )
 
-FetchContent_MakeAvailable(glfw glm json googletest)
+# Additional imgui setup
+FetchContent_GetProperties(imgui)
+if(NOT imgui_POPULATED)
+  FetchContent_Populate(imgui)
+
+  add_library(imgui STATIC
+          ${imgui_SOURCE_DIR}/imgui.cpp
+          ${imgui_SOURCE_DIR}/imgui_demo.cpp
+          ${imgui_SOURCE_DIR}/imgui_draw.cpp
+          ${imgui_SOURCE_DIR}/imgui_tables.cpp
+          ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+          # Backend files for GLFW + OpenGL3
+          ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
+          ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
+  )
+
+  target_include_directories(imgui PUBLIC
+          ${imgui_SOURCE_DIR}
+          ${imgui_SOURCE_DIR}/backends
+  )
+
+  target_link_libraries(imgui PUBLIC glfw OpenGL::GL)
+endif()
+
+FetchContent_MakeAvailable(glfw glm json imgui googletest)
 
 # OpenGL linking (portable)
 find_package(OpenGL REQUIRED)
@@ -65,6 +94,10 @@ add_executable(GLDemo
         src/game/Pyramid.cpp
         src/game/Pyramid.hpp
         src/game/Globals.hpp
+        src/game/Cube.cpp
+        src/game/Cube.hpp
+        src/scene/Scene.cpp
+        src/scene/Scene.hpp
 )
 
 target_include_directories(GLDemo PRIVATE ${CMAKE_SOURCE_DIR}/src)
@@ -73,6 +106,7 @@ target_link_libraries(GLDemo PRIVATE
   glfw
   glm::glm
   nlohmann_json::nlohmann_json
+  imgui
   OpenGL::GL
 )
 
