@@ -45,21 +45,21 @@ void Mesh::gl_init() {
         3,
         GL_FLOAT,
         GL_FALSE,
-        6 * sizeof(float),
+        3 * sizeof(float),
         (void*)0  // Starting at index 0
     );
     glEnableVertexAttribArray(0);
 
-    // Color attribute
-    glVertexAttribPointer(
-        1,
-        3,
-        GL_FLOAT,
-        GL_FALSE,
-        6 * sizeof(float),
-        (void*)(3*sizeof(float))  // offset by 3 preceding pos floats
-    );
-    glEnableVertexAttribArray(1);
+    // // Color attribute
+    // glVertexAttribPointer(
+    //     1,
+    //     3,
+    //     GL_FLOAT,
+    //     GL_FALSE,
+    //     6 * sizeof(float),
+    //     (void*)(3*sizeof(float))  // offset by 3 preceding pos floats
+    // );
+    // glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);  // unset VAO
 }

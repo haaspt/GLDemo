@@ -17,6 +17,7 @@
 #include "resources/ResourceManager.hpp"
 
 #include "game/Cube.hpp"
+#include "game/LightSource.hpp"
 
 constexpr unsigned int W_WIDTH = 800;
 constexpr unsigned int W_HEIGHT = 600;
@@ -45,7 +46,7 @@ GLFWwindow* initWindow() {
 
     glEnable(GL_DEPTH_TEST);
 
-    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
     // ImGUI setup
     IMGUI_CHECKVERSION();
@@ -70,17 +71,22 @@ int main(int /*argc*/, char** argv) {
 
     // Camera Setup
     Camera camera(55.0, static_cast<double>(W_WIDTH) / W_HEIGHT, 0.1, 500.0);
-    camera.set_position(0.25, 1.25, -3.0);
+    camera.set_position(0.0, 1.25, -3.0);
     camera.set_pitch(-25);
     camera.set_yaw(90);
 
     // World setup
     std::vector<std::unique_ptr<GameObject>> entities;
 
-
     auto cube = std::make_unique<Cube>();
     cube->set_position(0, 0, 0);
+    cube->set_material_color({1.0, 0.5, 0.31});
     entities.push_back(std::move(cube));
+
+    auto light_source = std::make_unique<LightSource>();
+    light_source->set_position(-1.5, 0.75, 0.0);
+    light_source->set_scale(0.25, 0.25, 0.25);
+    entities.push_back(std::move(light_source));
 
     
     double delta_t = 0.0;
@@ -100,6 +106,7 @@ int main(int /*argc*/, char** argv) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glfwPollEvents();
 
+        // Debug Text
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
@@ -110,10 +117,9 @@ int main(int /*argc*/, char** argv) {
         ImGui::Text("Min FPS: %.1f", fps_history.min_value(20));
         ImGui::PlotLines("FPS", fps_history.buffer(), fps_history.size(),
                  0, nullptr, 60.0f, 120.0f, ImVec2(0, 80));
+        
         ImGui::Separator();
-
-
-
+        
         ImGui::Text("Camera;  x: %.2f, y:%.2f, z: %.2f,\n\t pitch:%.2f, yaw:%.2f",
             camera.get_position().x,
             camera.get_position().y,
@@ -126,6 +132,8 @@ int main(int /*argc*/, char** argv) {
 
         ImGui::Text("World Objects:");
         ImGui::BeginChild("Scrolling");
+
+        // Render Loop
         for (const auto& object : entities) {
             ImGui::BulletText("Object: %d; x: %.2f, y:%.2f, z: %.2f\n\t rx:%.2f, ry:%.2f, rz:%.2f",
                 object->get_id(),
@@ -136,21 +144,18 @@ int main(int /*argc*/, char** argv) {
                 object->get_rotation_deg().y,
                 object->get_rotation_deg().z
                 );
-
-            object->rotate_deg({
-            0.0,
-            45.0 * delta_t,
-            0.0});
+            
             object->update(delta_t);
             object->render(camera);
         }
-        ImGui::EndChild();
 
+        ImGui::EndChild();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
 
+        // Attempt at frame timing
         this_frame_duration_ms = (glfwGetTime() - now) * 1000.0;
         time_to_next_frame_ms = FRAME_DURATION_MS - this_frame_duration_ms;
         if (time_to_next_frame_ms > 0.0) {

@@ -7,6 +7,7 @@
 #include "resources/Mesh.hpp"
 #include "resources/Shader.hpp"
 #include "resources/ResourceManager.hpp"
+#include "utilities/Vector.hpp"
 
 class GameObject : public Node {
 private:
@@ -15,6 +16,9 @@ private:
 
     std::string model_name;
     std::string shader_name;
+
+    Vector3 material_color{1.0};
+    Vector3 light_color{1.0};
 public:
     GameObject(const std::string& model_name, const std::string& shader_name)
         : model_name(model_name), shader_name(shader_name) {
@@ -67,6 +71,12 @@ public:
         }
         return *this;
     }
+
+    void set_material_color(const Vector3& color) {material_color = color;}
+    Vector3 get_material_color() const {return material_color;}
+
+    void set_light_color(const Vector3& color) {light_color = color;}
+    Vector3 get_light_color() const {return light_color;}
 
     void render(const Camera& camera) const;
 
