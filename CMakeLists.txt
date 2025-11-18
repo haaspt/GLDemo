@@ -137,19 +137,30 @@ include(GoogleTest)
 gtest_discover_tests(tests)
 
 # --- Runtime assets ---
-add_custom_command(TARGET GLDemo POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/src/game/shaders
-          $<TARGET_FILE_DIR:GLDemo>/shaders
-  COMMENT "Copying shaders to runtime directory"
+set(SHADER_DIR ${CMAKE_SOURCE_DIR}/src/game/shaders)
+set(MODEL_DIR  ${CMAKE_SOURCE_DIR}/src/game/models)
+set(RUNTIME_ASSET_DIR $<TARGET_FILE_DIR:GLDemo>)
+
+file(GLOB_RECURSE SHADER_FILES CONFIGURE_DEPENDS
+     "${SHADER_DIR}/*")
+file(GLOB_RECURSE MODEL_FILES  CONFIGURE_DEPENDS
+     "${MODEL_DIR}/*")
+
+set(ASSET_STAMP "${CMAKE_CURRENT_BINARY_DIR}/copy_assets.stamp")
+
+add_custom_command(
+  OUTPUT  ${ASSET_STAMP}
+  COMMAND ${CMAKE_COMMAND} -E make_directory "${RUNTIME_ASSET_DIR}/shaders"
+  COMMAND ${CMAKE_COMMAND} -E make_directory "${RUNTIME_ASSET_DIR}/models"
+  COMMAND ${CMAKE_COMMAND} -E copy_directory "${SHADER_DIR}" "${RUNTIME_ASSET_DIR}/shaders"
+  COMMAND ${CMAKE_COMMAND} -E copy_directory "${MODEL_DIR}"  "${RUNTIME_ASSET_DIR}/models"
+  COMMAND ${CMAKE_COMMAND} -E touch "${ASSET_STAMP}"
+  DEPENDS ${SHADER_FILES} ${MODEL_FILES}
+  COMMENT "Copying shaders/models to runtime directory"
 )
 
-add_custom_command(TARGET GLDemo POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/src/game/models
-          $<TARGET_FILE_DIR:GLDemo>/models
-  COMMENT "Copying models to runtime directory"
-)
+add_custom_target(copy_assets ALL DEPENDS ${ASSET_STAMP})
+add_dependencies(GLDemo copy_assets)
 
 target_compile_options(GLDemo PRIVATE -Wall -Wextra -Wpedantic)
 target_compile_options(tests PRIVATE -Wall -Wextra -Wpedantic)
