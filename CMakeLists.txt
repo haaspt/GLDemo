@@ -91,13 +91,11 @@ add_executable(GLDemo
   src/resources/ResourceManager.hpp
   src/objects/Node.cpp
   src/objects/Node.hpp
-        src/game/Pyramid.cpp
-        src/game/Pyramid.hpp
-        src/game/Globals.hpp
-        src/game/Cube.cpp
-        src/game/Cube.hpp
-        src/scene/Scene.cpp
-        src/scene/Scene.hpp
+  src/game/Pyramid.cpp
+  src/game/Pyramid.hpp
+  src/game/Globals.hpp
+  src/game/Cube.cpp
+  src/game/Cube.hpp
 )
 
 target_include_directories(GLDemo PRIVATE ${CMAKE_SOURCE_DIR}/src)
