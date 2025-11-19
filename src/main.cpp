@@ -17,6 +17,7 @@
 #include "resources/ResourceManager.hpp"
 
 #include "game/Cube.hpp"
+#include "game/Pyramid.hpp"
 #include "game/LightSource.hpp"
 
 constexpr unsigned int W_WIDTH = 800;
@@ -71,22 +72,21 @@ int main(int /*argc*/, char** argv) {
 
     // Camera Setup
     Camera camera(55.0, static_cast<double>(W_WIDTH) / W_HEIGHT, 0.1, 500.0);
-    camera.set_position(0.0, 1.25, -3.0);
+    camera.set_position(-2.25, 1.25, -2.0);
     camera.set_pitch(-25);
-    camera.set_yaw(90);
+    camera.set_yaw(45);
 
     // World setup
     std::vector<std::unique_ptr<GameObject>> entities;
+
+    auto light_source = LightSource();
+    light_source.set_position(-1.5, 0.75, 0.0);
+    light_source.set_scale(0.25, 0.25, 0.25);
 
     auto cube = std::make_unique<Cube>();
     cube->set_position(0, 0, 0);
     cube->set_material_color({1.0, 0.5, 0.31});
     entities.push_back(std::move(cube));
-
-    auto light_source = std::make_unique<LightSource>();
-    light_source->set_position(-1.5, 0.75, 0.0);
-    light_source->set_scale(0.25, 0.25, 0.25);
-    entities.push_back(std::move(light_source));
 
     
     double delta_t = 0.0;
@@ -134,6 +134,9 @@ int main(int /*argc*/, char** argv) {
         ImGui::BeginChild("Scrolling");
 
         // Render Loop
+        light_source.update(delta_t);
+        light_source.render(camera);
+
         for (const auto& object : entities) {
             ImGui::BulletText("Object: %d; x: %.2f, y:%.2f, z: %.2f\n\t rx:%.2f, ry:%.2f, rz:%.2f",
                 object->get_id(),
@@ -144,6 +147,8 @@ int main(int /*argc*/, char** argv) {
                 object->get_rotation_deg().y,
                 object->get_rotation_deg().z
                 );
+            
+            object->set_light_pos(light_source.get_position());
             
             object->update(delta_t);
             object->render(camera);

@@ -5,6 +5,7 @@ out vec4 FragColor;
 
 uniform vec3 material_color;
 uniform vec3 light_color;
+uniform vec3 light_pos;
 
 void main()
 {

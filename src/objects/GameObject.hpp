@@ -19,6 +19,7 @@ private:
 
     Vector3 material_color{1.0};
     Vector3 light_color{1.0};
+    Vector3 light_pos{0.0};
 public:
     GameObject(const std::string& model_name, const std::string& shader_name)
         : model_name(model_name), shader_name(shader_name) {
@@ -77,6 +78,9 @@ public:
 
     void set_light_color(const Vector3& color) {light_color = color;}
     Vector3 get_light_color() const {return light_color;}
+
+    void set_light_pos(const Vector3& pos) {light_pos = pos;}
+    Vector3 get_light_pos() const {return light_pos;}
 
     void render(const Camera& camera) const;
 
