@@ -22,6 +22,6 @@ public:
 
     Vector3 accel_vector{0.0};
 
-    void process(double const /*delta_t*/) override {};
+    void process(double const delta_t) override {rotation_rad.y += delta_t;}
 
 };

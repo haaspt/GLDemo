@@ -5,4 +5,5 @@
 #include "Pyramid.hpp"
 
 void Pyramid::process(double const delta_t) {
+    rotation_rad.y += delta_t;
 }

@@ -74,19 +74,25 @@ int main(int /*argc*/, char** argv) {
     Camera camera(55.0, static_cast<double>(W_WIDTH) / W_HEIGHT, 0.1, 500.0);
     camera.set_position(-2.25, 1.25, -2.0);
     camera.set_pitch(-25);
-    camera.set_yaw(45);
+    camera.set_yaw(35);
 
     // World setup
     std::vector<std::unique_ptr<GameObject>> entities;
 
     auto light_source = LightSource();
     light_source.set_position(-1.5, 0.75, 0.0);
-    light_source.set_scale(0.25, 0.25, 0.25);
+    light_source.set_scale(0.125, 0.125, 0.125);
+    light_source.rotate_deg({180, 0, 0});
 
     auto cube = std::make_unique<Cube>();
     cube->set_position(0, 0, 0);
     cube->set_material_color({1.0, 0.5, 0.31});
     entities.push_back(std::move(cube));
+
+    auto pyramid = std::make_unique<Pyramid>();
+    pyramid->set_position(2.0, -1.5, -1.5);
+    pyramid->set_material_color({0.5, 0.31, 1.0});
+    entities.push_back(std::move(pyramid));
 
     
     double delta_t = 0.0;
