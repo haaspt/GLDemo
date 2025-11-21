@@ -9,7 +9,7 @@
 
 class Cube : public GameObject {
 public:
-    Cube() : GameObject("cube", "default") {}
+    Cube() : GameObject("cube", "default", "default.jpg") {}
 
     const double max_warp_speed = 1000;
     const double max_lateral_speed = 450;

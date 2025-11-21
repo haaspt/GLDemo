@@ -34,6 +34,13 @@ FetchContent_Declare(json
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
 
+# --- stb_image (header-only) ---
+FetchContent_Declare(stb
+  GIT_REPOSITORY https://github.com/nothings/stb.git
+  GIT_TAG master
+)
+FetchContent_MakeAvailable(stb)
+
 FetchContent_Declare(imgui
   GIT_REPOSITORY https://github.com/ocornut/imgui.git
   GIT_TAG v1.91.5
@@ -79,6 +86,7 @@ add_executable(GLDemo
   src/resources/Mesh.hpp
   src/resources/Shader.cpp
   src/resources/Shader.hpp
+  src/resources/Texture.hpp
   src/objects/GameObject.cpp
   src/objects/GameObject.hpp
   src/objects/Camera.hpp
@@ -96,9 +104,13 @@ add_executable(GLDemo
   src/game/Globals.hpp
   src/game/Cube.cpp
   src/game/Cube.hpp
+  src/third_party/stb_image_impl.cpp
 )
 
 target_include_directories(GLDemo PRIVATE ${CMAKE_SOURCE_DIR}/src)
+target_include_directories(GLDemo PRIVATE
+  ${stb_SOURCE_DIR}  # gives you stb_image.h, stb_truetype.h, etc.
+)
 
 target_link_libraries(GLDemo PRIVATE
   glfw
@@ -139,12 +151,15 @@ gtest_discover_tests(tests)
 # --- Runtime assets ---
 set(SHADER_DIR ${CMAKE_SOURCE_DIR}/src/game/shaders)
 set(MODEL_DIR  ${CMAKE_SOURCE_DIR}/src/game/models)
+set(TEXTURE_DIR  ${CMAKE_SOURCE_DIR}/src/game/textures)
 set(RUNTIME_ASSET_DIR $<TARGET_FILE_DIR:GLDemo>)
 
 file(GLOB_RECURSE SHADER_FILES CONFIGURE_DEPENDS
      "${SHADER_DIR}/*")
 file(GLOB_RECURSE MODEL_FILES  CONFIGURE_DEPENDS
      "${MODEL_DIR}/*")
+file(GLOB_RECURSE TEXTURE_FILES  CONFIGURE_DEPENDS
+     "${TEXTURE_DIR}/*")
 
 set(ASSET_STAMP "${CMAKE_CURRENT_BINARY_DIR}/copy_assets.stamp")
 
@@ -152,8 +167,10 @@ add_custom_command(
   OUTPUT  ${ASSET_STAMP}
   COMMAND ${CMAKE_COMMAND} -E make_directory "${RUNTIME_ASSET_DIR}/shaders"
   COMMAND ${CMAKE_COMMAND} -E make_directory "${RUNTIME_ASSET_DIR}/models"
+  COMMAND ${CMAKE_COMMAND} -E make_directory "${RUNTIME_ASSET_DIR}/textures"
   COMMAND ${CMAKE_COMMAND} -E copy_directory "${SHADER_DIR}" "${RUNTIME_ASSET_DIR}/shaders"
   COMMAND ${CMAKE_COMMAND} -E copy_directory "${MODEL_DIR}"  "${RUNTIME_ASSET_DIR}/models"
+  COMMAND ${CMAKE_COMMAND} -E copy_directory "${TEXTURE_DIR}"  "${RUNTIME_ASSET_DIR}/textures"
   COMMAND ${CMAKE_COMMAND} -E touch "${ASSET_STAMP}"
   DEPENDS ${SHADER_FILES} ${MODEL_FILES}
   COMMENT "Copying shaders/models to runtime directory"

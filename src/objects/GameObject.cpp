@@ -9,5 +9,12 @@ void GameObject::render(const Camera& camera) const {
     shader->set_vec3("light_color", light_color.to_glm());
     shader->set_vec3("light_pos", light_pos.to_glm());
     shader->set_vec3("view_pos", camera.get_position().to_glm());
+    if (texture) {
+        shader->set_bool("useTexture", true);
+        shader->set_int("albedoTex", 0);
+        texture->bind(0);
+    } else {
+        shader->set_bool("useTexture", false);
+    }
     mesh->draw();
 }

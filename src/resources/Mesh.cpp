@@ -45,7 +45,7 @@ void Mesh::gl_init() {
         3,
         GL_FLOAT,
         GL_FALSE,
-        6 * sizeof(float),
+        8 * sizeof(float),
         (void*)0  // Starting at index 0
     );
     glEnableVertexAttribArray(0);
@@ -56,10 +56,21 @@ void Mesh::gl_init() {
         3,
         GL_FLOAT,
         GL_FALSE,
-        6 * sizeof(float),
+        8 * sizeof(float),
         (void*)(3*sizeof(float))  // offset by 3 preceding pos floats
     );
     glEnableVertexAttribArray(1);
+
+    // UV attribute
+    glVertexAttribPointer(
+        2,
+        2,
+        GL_FLOAT,
+        GL_FALSE,
+        8 * sizeof(float),
+        (void*)(6*sizeof(float))  // offset by 3 preceding normal floats
+    );
+    glEnableVertexAttribArray(2);
 
     glBindVertexArray(0);  // unset VAO
 }

@@ -6,6 +6,7 @@
 #include "objects/Camera.hpp"
 #include "resources/Mesh.hpp"
 #include "resources/Shader.hpp"
+#include "resources/Texture.hpp"
 #include "resources/ResourceManager.hpp"
 #include "utilities/Vector.hpp"
 
@@ -13,18 +14,23 @@ class GameObject : public Node {
 private:
     Mesh* mesh = nullptr;
     Shader* shader = nullptr;
+    Texture* texture = nullptr;
 
     std::string model_name;
     std::string shader_name;
+    std::string texture_name;
 
     Vector3 material_color{1.0};
     Vector3 light_color{1.0};
     Vector3 light_pos{0.0};
 public:
-    GameObject(const std::string& model_name, const std::string& shader_name)
-        : model_name(model_name), shader_name(shader_name) {
+    GameObject(const std::string& model_name, const std::string& shader_name, const std::string& texture_name="")
+        : model_name(model_name), shader_name(shader_name), texture_name(texture_name) {
         mesh = Managers::mesh_manager().get(model_name);
         shader = Managers::shader_manager().get(shader_name);
+        if (!texture_name.empty()) {
+            texture = Managers::texture_manager().get(texture_name);
+        }
     };
     ~GameObject() noexcept override {
         if (mesh) {
@@ -32,6 +38,9 @@ public:
         }
         if (shader) {
             Managers::shader_manager().release(shader_name);
+        }
+        if (texture) {
+            Managers::texture_manager().release(texture_name);
         }
     }
 

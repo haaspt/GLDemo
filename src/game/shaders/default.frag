@@ -1,6 +1,7 @@
 #version 330 core
 in vec3 FragPos;
 in vec3 Normal;
+in vec2 UV;
 
 out vec4 FragColor;
 
@@ -8,6 +9,9 @@ uniform vec3 material_color;
 uniform vec3 light_color;
 uniform vec3 light_pos;
 uniform vec3 view_pos;
+
+uniform bool useTexture;
+uniform sampler2D albedoTex;
 
 void main()
 {
@@ -26,6 +30,9 @@ void main()
     float spec = pow(max(dot(view_dir, reflect_dir), 0.0), 32);
     vec3 specular = specular_strength * spec * light_color;
 
-    vec3 result = (ambient + diffuse + specular) * material_color;
+    vec3 base_color = useTexture ? texture(albedoTex, UV).rgb : material_color;
+
+    vec3 result = (ambient + diffuse + specular) * base_color;
+
     FragColor = vec4(result, 1.0);
 }
