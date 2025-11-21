@@ -9,3 +9,5 @@ cmake-build-debug/
 *.o
 
 imgui.ini
+
+.DS_Store
