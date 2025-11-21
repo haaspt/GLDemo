@@ -28,6 +28,16 @@ FetchContent_Declare(glm
   GIT_TAG 1.0.1
 )
 
+FetchContent_Declare(assimp
+  GIT_REPOSITORY https://github.com/assimp/assimp.git
+  GIT_TAG v6.0.2
+)
+
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_INJECT_DEBUG_POSTFIX OFF CACHE BOOL "" FORCE)
+set(ASSIMP_INSTALL OFF CACHE BOOL "" FORCE)
+
+
 # nlohmann/json exports target nlohmann_json::nlohmann_json
 FetchContent_Declare(json
   URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz
@@ -75,7 +85,7 @@ if(NOT imgui_POPULATED)
   target_link_libraries(imgui PUBLIC glfw OpenGL::GL)
 endif()
 
-FetchContent_MakeAvailable(glfw glm json imgui googletest)
+FetchContent_MakeAvailable(glfw glm assimp json imgui googletest)
 
 # OpenGL linking (portable)
 find_package(OpenGL REQUIRED)
@@ -105,15 +115,18 @@ add_executable(GLDemo
   src/game/Cube.cpp
   src/game/Cube.hpp
   src/third_party/stb_image_impl.cpp
+  src/resources/Model.cpp
+  src/resources/Model.hpp
 )
 
 target_include_directories(GLDemo PRIVATE ${CMAKE_SOURCE_DIR}/src)
 target_include_directories(GLDemo PRIVATE
-  ${stb_SOURCE_DIR}  # gives you stb_image.h, stb_truetype.h, etc.
+  ${stb_SOURCE_DIR}
 )
 
 target_link_libraries(GLDemo PRIVATE
   glfw
+  assimp::assimp
   glm::glm
   nlohmann_json::nlohmann_json
   imgui
@@ -161,22 +174,15 @@ file(GLOB_RECURSE MODEL_FILES  CONFIGURE_DEPENDS
 file(GLOB_RECURSE TEXTURE_FILES  CONFIGURE_DEPENDS
      "${TEXTURE_DIR}/*")
 
-set(ASSET_STAMP "${CMAKE_CURRENT_BINARY_DIR}/copy_assets.stamp")
-
-add_custom_command(
-  OUTPUT  ${ASSET_STAMP}
-  COMMAND ${CMAKE_COMMAND} -E make_directory "${RUNTIME_ASSET_DIR}/shaders"
-  COMMAND ${CMAKE_COMMAND} -E make_directory "${RUNTIME_ASSET_DIR}/models"
-  COMMAND ${CMAKE_COMMAND} -E make_directory "${RUNTIME_ASSET_DIR}/textures"
-  COMMAND ${CMAKE_COMMAND} -E copy_directory "${SHADER_DIR}" "${RUNTIME_ASSET_DIR}/shaders"
-  COMMAND ${CMAKE_COMMAND} -E copy_directory "${MODEL_DIR}"  "${RUNTIME_ASSET_DIR}/models"
-  COMMAND ${CMAKE_COMMAND} -E copy_directory "${TEXTURE_DIR}"  "${RUNTIME_ASSET_DIR}/textures"
-  COMMAND ${CMAKE_COMMAND} -E touch "${ASSET_STAMP}"
-  DEPENDS ${SHADER_FILES} ${MODEL_FILES}
-  COMMENT "Copying shaders/models to runtime directory"
+add_custom_target(copy_assets ALL
+        COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:GLDemo>/shaders"
+        COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:GLDemo>/models"
+        COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:GLDemo>/textures"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "${SHADER_DIR}"  "$<TARGET_FILE_DIR:GLDemo>/shaders"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "${MODEL_DIR}"   "$<TARGET_FILE_DIR:GLDemo>/models"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "${TEXTURE_DIR}" "$<TARGET_FILE_DIR:GLDemo>/textures"
+        COMMENT "Copying shaders/models/textures to runtime directory"
 )
-
-add_custom_target(copy_assets ALL DEPENDS ${ASSET_STAMP})
 add_dependencies(GLDemo copy_assets)
 
 target_compile_options(GLDemo PRIVATE -Wall -Wextra -Wpedantic)
