@@ -7,6 +7,8 @@
 #include <cmath>
 
 #include <glm/glm.hpp>
+#include <assimp/matrix4x4.h>
+#include <assimp/vector3.h>
 
 #include "utilities/Utils.hpp"
 
@@ -124,6 +126,7 @@ struct Vector3 {
     Vector3() : Vector3(0.0) {}
     Vector3(double x, double y, double z): x(x), y(y), z(z) {}
     explicit Vector3(double scalar): x(scalar), y(scalar), z(scalar) {}
+    explicit Vector3(const aiVector3D& ai_vector3) : x(ai_vector3.x), y(ai_vector3.y), z(ai_vector3.z) {}
     static Vector3 ZERO() {return Vector3(0);}
 
     Vector3& operator+=(const Vector3& other) {
@@ -365,6 +368,24 @@ public:
         data[5]  = scalar;
         data[10] = scalar;
         data[15] = scalar;
+    }
+    explicit Transform(const aiMatrix4x4& ai_matrix4x4) : data{0} {
+        data[0]  = ai_matrix4x4.a1;
+        data[1]  = ai_matrix4x4.a2;
+        data[2]  = ai_matrix4x4.a3;
+        data[3]  = ai_matrix4x4.a4;
+        data[4]  = ai_matrix4x4.b1;
+        data[5]  = ai_matrix4x4.b2;
+        data[6]  = ai_matrix4x4.b3;
+        data[7]  = ai_matrix4x4.b4;
+        data[8]  = ai_matrix4x4.c1;
+        data[9]  = ai_matrix4x4.c2;
+        data[10] = ai_matrix4x4.c3;
+        data[11] = ai_matrix4x4.c4;
+        data[12] = ai_matrix4x4.d1;
+        data[13] = ai_matrix4x4.d2;
+        data[14] = ai_matrix4x4.d3;
+        data[15] = ai_matrix4x4.d4;
     }
 
     double& operator[](size_t index) {return data[index];}
