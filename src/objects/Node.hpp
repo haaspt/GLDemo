@@ -13,6 +13,7 @@ private:
     mutable bool is_transform_dirty = false;
 
     void update_transform() const;
+
 protected:
     Vector3 velocity = Vector3(0.0);
     Vector3 position = Vector3(0.0);
@@ -23,26 +24,35 @@ protected:
     std::unordered_map<unsigned int, Node*> child_nodes = {};
 
     void add_parent(Node* parent_ptr);
+
     void reparent(Node* new_parent_ptr);
+
     void add_child(Node* child_ptr);
+
     void remove_child(unsigned int child_id);
 
     const Transform& get_transform() const;
-    void set_dirty_flag() const {is_transform_dirty = true;}
 
-    virtual void process(double const/*delta_t*/) {}
+    void set_dirty_flag() const { is_transform_dirty = true; }
+
+    virtual void process(double const/*delta_t*/) {
+    }
 
     Node(const Node&) = delete;
+
     Node& operator=(const Node&) = delete;
 
     Node(Node&&) noexcept = default;
+
     Node& operator=(Node&&) noexcept = default;
-    
+
 public:
-    Node() : id(Utils::IdGen::get_id()) {}
+    Node() : id(Utils::IdGen::get_id()) {
+    }
+
     virtual ~Node() noexcept = default;
 
-    unsigned int get_id() const {return id;}
+    unsigned int get_id() const { return id; }
 
     void update(double delta_t);
 
@@ -62,10 +72,12 @@ public:
     Vector3 get_position() const {
         return position;
     }
+
     void set_position(Vector3 const pos) {
         position = pos;
         set_dirty_flag();
     }
+
     void set_position(double const x, double const y, double const z) {
         set_position({x, y, z});
     }
@@ -73,10 +85,12 @@ public:
     Vector3 get_scale() const {
         return scale;
     }
+
     void set_scale(Vector3 scl) {
         scale = scl;
         set_dirty_flag();
     }
+
     void set_scale(double const x, double const y, double const z) {
         set_scale({x, y, z});
     }
@@ -84,6 +98,7 @@ public:
     Vector3 get_rotation_rad() const {
         return rotation_rad;
     }
+
     void set_rotation_rad(Vector3 rot_rad) {
         rotation_rad = {
             Utils::wrap_radians(rot_rad.x),
@@ -92,15 +107,19 @@ public:
         };
         set_dirty_flag();
     }
+
     void set_rotation_rad(double const x_rad, double const y_rad, double const z_rad) {
         set_rotation_rad({x_rad, y_rad, z_rad});
     }
+
     Vector3 get_rotation_deg() const {
         return rotation_rad.to_degrees();
     }
+
     void set_rotation_deg(Vector3 rot_deg) {
         set_rotation_rad(rot_deg.to_radians());
     }
+
     void set_rotation_deg(double const x_deg, double const y_deg, double const z_deg) {
         set_rotation_rad(Vector3(x_deg, y_deg, z_deg).to_radians());
     }
@@ -111,12 +130,15 @@ public:
         rotation_rad.z = Utils::wrap_radians(rotation_rad.z + rot_rad.z);
         set_dirty_flag();
     }
+
     void rotate_rad(double const x_rad, double const y_rad, double const z_rad) {
         rotate_rad({x_rad, y_rad, z_rad});
     }
+
     void rotate_deg(Vector3 rot_deg) {
         rotate_rad(rot_deg.to_radians());
     }
+
     void rotate_deg(double const x_deg, double const y_deg, double const z_deg) {
         rotate_rad(Vector3(x_deg, y_deg, z_deg).to_radians());
     }

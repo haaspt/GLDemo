@@ -10,7 +10,8 @@
 
 class LightSource : public GameObject {
 public:
-    LightSource() : GameObject("cube", "light_source") {}
+    LightSource() : GameObject("cube", "light_source") {
+    }
 
     void process(double const delta_t) override {
         Vector3 input_vec = Input::get_input_vec();
@@ -18,5 +19,4 @@ public:
         position.y += input_vec.y * delta_t * 1.0;
         position.z += input_vec.z * delta_t * 1.0;
     }
-
 };

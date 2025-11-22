@@ -85,7 +85,7 @@ int main(int /*argc*/, char** argv) {
     light_source.set_scale(0.125, 0.125, 0.125);
     light_source.rotate_deg({180, 0, 0});
 
-    
+
     double delta_t = 0.0;
     double last = glfwGetTime();
     double now = 0.0;
@@ -93,7 +93,7 @@ int main(int /*argc*/, char** argv) {
     double time_to_next_frame_ms = 0.0;
 
     Utils::CircularBuffer fps_history(100);
-    
+
     // Main loop
     while (!glfwWindowShouldClose(window)) {
         now = glfwGetTime();
@@ -113,16 +113,16 @@ int main(int /*argc*/, char** argv) {
         ImGui::Text("Mean FPS: %.1f", fps_history.average_value(20));
         ImGui::Text("Min FPS: %.1f", fps_history.min_value(20));
         ImGui::PlotLines("FPS", fps_history.buffer(), fps_history.size(),
-                 0, nullptr, 60.0f, 120.0f, ImVec2(0, 80));
-        
+                         0, nullptr, 60.0f, 120.0f, ImVec2(0, 80));
+
         ImGui::Separator();
-        
+
         ImGui::Text("Camera;  x: %.2f, y:%.2f, z: %.2f,\n\t pitch:%.2f, yaw:%.2f",
-            camera.get_position().x,
-            camera.get_position().y,
-            camera.get_position().z,
-            camera.get_pitch(),
-            camera.get_yaw()
+                    camera.get_position().x,
+                    camera.get_position().y,
+                    camera.get_position().z,
+                    camera.get_pitch(),
+                    camera.get_yaw()
         );
 
         ImGui::Separator();

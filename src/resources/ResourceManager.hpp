@@ -24,10 +24,13 @@ private:
         Resource* ptr;
         int ref_count;
     };
+
     std::unordered_map<std::string, Entry> resources = {};
     Loader loader;
+
 public:
-    explicit ResourceManager(Loader loader) : loader(std::move(loader)) {};
+    explicit ResourceManager(Loader loader) : loader(std::move(loader)) {
+    };
 
     Resource* get(const std::string& name) {
         auto it = resources.find(name);
@@ -56,7 +59,8 @@ public:
 struct ShaderLoader {
     const std::filesystem::path shader_dir;
 
-    explicit ShaderLoader(const std::string& shader_dir) : shader_dir(shader_dir) {};
+    explicit ShaderLoader(const std::string& shader_dir) : shader_dir(shader_dir) {
+    };
 
     Shader* load(const std::string& shader_name) const {
         const auto vertex_shader_path = shader_dir / (shader_name + ".vert");
@@ -65,7 +69,7 @@ struct ShaderLoader {
         Shader* shader = new Shader(
             vertex_shader_path.string(),
             fragment_shader_path.string()
-            );
+        );
         return shader;
     }
 
@@ -77,7 +81,8 @@ struct ShaderLoader {
 struct MeshLoader {
     const std::filesystem::path model_dir;
 
-    explicit MeshLoader(const std::string& model_dir) : model_dir(model_dir) {};
+    explicit MeshLoader(const std::string& model_dir) : model_dir(model_dir) {
+    };
 
     Mesh* load(const std::string& model_name) {
         const auto model_json_path = model_dir / (model_name + ".json");
@@ -97,7 +102,8 @@ struct MeshLoader {
 struct TextureLoader {
     const std::filesystem::path texture_dir;
 
-    explicit TextureLoader(const std::string& texture_dir) : texture_dir(texture_dir) {};
+    explicit TextureLoader(const std::string& texture_dir) : texture_dir(texture_dir) {
+    };
 
     Texture* load(const std::string& texture_name, bool srgb = true) {
         const auto texture_file_path = texture_dir / texture_name;
@@ -119,6 +125,7 @@ class Managers {
 private:
     static std::filesystem::path exe_dir_path;
     static bool initialized;
+
 public:
     static void initialize(const std::filesystem::path& exe_path) {
         Managers::exe_dir_path = exe_path;

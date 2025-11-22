@@ -11,15 +11,18 @@ public:
             aspect_ratio,
             near_plane_dist,
             far_plane_dist
-    )) {}
-    
+        )) {
+    }
+
     Vector3 get_position() const {
         return position;
     }
+
     void set_position(Vector3 pos) {
         position = pos;
         view_dirty = true;
     }
+
     void set_position(double x, double y, double z) {
         set_position({x, y, z});
     }
@@ -27,6 +30,7 @@ public:
     double get_pitch() const {
         return Utils::to_degrees(pitch);
     }
+
     void set_pitch(double pitch_deg) {
         pitch = Utils::to_radians(pitch_deg);
         view_dirty = true;
@@ -35,6 +39,7 @@ public:
     double get_yaw() const {
         return Utils::to_degrees(yaw);
     }
+
     void set_yaw(double yaw_deg) {
         yaw = Utils::to_radians(yaw_deg);
         view_dirty = true;
@@ -46,6 +51,7 @@ public:
         }
         return view;
     }
+
     const Transform& get_projection_matrix() const {
         return projection;
     }
@@ -53,11 +59,11 @@ public:
 private:
     mutable bool view_dirty = true;
     // TODO: allow FOV and aspect changes
-    
+
     Vector3 position = Vector3(0.0);
     double yaw = 0.0;
     double pitch = 0.0;
-    
+
     mutable Transform view = Transform(1.0);
     Transform projection;
 
@@ -67,12 +73,12 @@ private:
         front.y = sin(pitch);
         front.z = sin(yaw) * cos(pitch);
         front.normalize();
-        
+
         view = look_at(
             position,
             position + front
         );
-        
+
         view_dirty = false;
     }
 };

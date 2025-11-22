@@ -32,10 +32,10 @@ Transform& Transform::operator*=(const Transform& rhs) {
         const int r0 = r * 4;
         for (int c = 0; c < 4; ++c) {
             out[r0 + c] =
-                data[r0 + 0] * rhs.data[0 * 4 + c] +
-                data[r0 + 1] * rhs.data[1 * 4 + c] +
-                data[r0 + 2] * rhs.data[2 * 4 + c] +
-                data[r0 + 3] * rhs.data[3 * 4 + c];
+                    data[r0 + 0] * rhs.data[0 * 4 + c] +
+                    data[r0 + 1] * rhs.data[1 * 4 + c] +
+                    data[r0 + 2] * rhs.data[2 * 4 + c] +
+                    data[r0 + 3] * rhs.data[3 * 4 + c];
         }
     }
 
@@ -53,7 +53,7 @@ Transform& Transform::translate(const Vector3& vec) {
     t.at(0, 3) = vec.x;
     t.at(1, 3) = vec.y;
     t.at(2, 3) = vec.z;
-    
+
     *this *= t;
     return *this;
 }
@@ -119,8 +119,8 @@ Transform Transform::perspective(double fov_rad, double aspect, double z_near, d
     Transform result(0.0);
     result.at(0, 0) = f / aspect;
     result.at(1, 1) = f;
-    result.at(2, 2) = - (z_far + z_near) / (z_far - z_near);
-    result.at(2, 3) = - (2.0 * z_far * z_near) / (z_far - z_near);
+    result.at(2, 2) = -(z_far + z_near) / (z_far - z_near);
+    result.at(2, 3) = -(2.0 * z_far * z_near) / (z_far - z_near);
     result.at(3, 2) = -1.0;
     result.at(3, 3) = 0.0;
     return result;
@@ -137,17 +137,17 @@ Transform look_at(const Vector3& eye, const Vector3& target, const Vector3& up) 
     // [U.x, U.y, U.z, -U·eye]
     // [-F.x, -F.y, -F.z, F·eye]
     // [0, 0, 0, 1]
-    
+
     result.at(0, 0) = s.x;
     result.at(0, 1) = s.y;
     result.at(0, 2) = s.z;
     result.at(0, 3) = -s.dot(eye);
-    
+
     result.at(1, 0) = u.x;
     result.at(1, 1) = u.y;
     result.at(1, 2) = u.z;
     result.at(1, 3) = -u.dot(eye);
-    
+
     result.at(2, 0) = -f.x;
     result.at(2, 1) = -f.y;
     result.at(2, 2) = -f.z;

@@ -9,8 +9,8 @@
 
 class Cube : public GameObject {
 public:
-    Cube() : GameObject("cube", "default", "default.jpg") {}
+    Cube() : GameObject("cube", "default", "default.jpg") {
+    }
 
-    void process(double const delta_t) override {rotation_rad.y += delta_t;}
-
+    void process(double const delta_t) override { rotation_rad.y += delta_t; }
 };

@@ -9,7 +9,6 @@
 #include "resources/Shader.hpp"
 
 
-
 std::string load_shader_source_from_file(const std::string& shader_path) {
     std::string shader_code;
     std::ifstream shader_file;
@@ -17,19 +16,16 @@ std::string load_shader_source_from_file(const std::string& shader_path) {
     // enable exceptions
     shader_file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
-    try
-    {
+    try {
         shader_file.open(shader_path);
         std::stringstream shader_stream;
         shader_stream << shader_file.rdbuf();
         shader_file.close();
         shader_code = shader_stream.str();
-    }
-    catch(std::ifstream::failure e)
-    {
+    } catch (std::ifstream::failure e) {
         std::cerr << e.what() << '\n';
     }
-    
+
     return shader_code;
 }
 
@@ -55,7 +51,7 @@ Shader::Shader(const std::string& vertex_shader_path, const std::string& fragemn
 
     glCompileShader(v_shader);
 
-    
+
     glGetShaderiv(v_shader, GL_COMPILE_STATUS, &success);
     if (!success) {
         glGetShaderInfoLog(v_shader, 512, 0, info_log);
@@ -105,7 +101,6 @@ Shader::Shader(const std::string& vertex_shader_path, const std::string& fragemn
 
     glDeleteShader(v_shader);
     glDeleteShader(f_shader);
-
 }
 
 Shader::~Shader() {
@@ -119,7 +114,7 @@ void Shader::use() const {
 void Shader::set_bool(const std::string& param_name, bool value) const {
     glUniform1i(
         glGetUniformLocation(id, param_name.c_str()),
-        (int)value
+        (int) value
     );
 }
 

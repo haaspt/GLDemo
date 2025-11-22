@@ -8,8 +8,8 @@
 
 class Pyramid : public GameObject {
 public:
-    Pyramid() : GameObject("pyramid", "default") {}
-    
-    void process(double const delta_t) override;
+    Pyramid() : GameObject("pyramid", "default") {
+    }
 
+    void process(double const delta_t) override;
 };

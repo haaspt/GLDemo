@@ -2,15 +2,14 @@
 
 Mesh::MeshData Mesh::get_mesh_data(const json& j_data) const {
     MeshData new_data{
-        j_data["vertices"].get<std::vector<float>>(),
-        j_data["indices"].get<std::vector<int>>(),
+        j_data["vertices"].get<std::vector<float> >(),
+        j_data["indices"].get<std::vector<int> >(),
         j_data["name"]
-        };
+    };
     return new_data;
 }
 
-Mesh::Mesh(const json& json_data) :
-    mesh_data(get_mesh_data(json_data)), index_count(mesh_data.indices.size()) {
+Mesh::Mesh(const json& json_data) : mesh_data(get_mesh_data(json_data)), index_count(mesh_data.indices.size()) {
     gl_init();
 }
 
@@ -46,7 +45,7 @@ void Mesh::gl_init() {
         GL_FLOAT,
         GL_FALSE,
         8 * sizeof(float),
-        (void*)0  // Starting at index 0
+        (void*) 0  // Starting at index 0
     );
     glEnableVertexAttribArray(0);
 
@@ -57,7 +56,7 @@ void Mesh::gl_init() {
         GL_FLOAT,
         GL_FALSE,
         8 * sizeof(float),
-        (void*)(3*sizeof(float))  // offset by 3 preceding pos floats
+        (void*) (3 * sizeof(float))  // offset by 3 preceding pos floats
     );
     glEnableVertexAttribArray(1);
 
@@ -68,7 +67,7 @@ void Mesh::gl_init() {
         GL_FLOAT,
         GL_FALSE,
         8 * sizeof(float),
-        (void*)(6*sizeof(float))  // offset by 3 preceding normal floats
+        (void*) (6 * sizeof(float))  // offset by 3 preceding normal floats
     );
     glEnableVertexAttribArray(2);
 

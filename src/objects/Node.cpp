@@ -13,7 +13,7 @@ void Node::update_transform() const {
     } else {
         transform = Transform(1.0);
     }
-    
+
     transform.translate(position);
 
     transform.rotate(rotation_rad.y, Vector3(0, 1, 0));
