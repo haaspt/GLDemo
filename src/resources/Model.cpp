@@ -39,25 +39,26 @@ Model::Model(const std::string& model_path) {
 
     // Load meshes
     for (unsigned int i = 0; i < scene->mNumMeshes; i++) {
-        MeshTemp new_mesh;
+        std::vector<float> mesh_data;
+        std::vector<unsigned int> index_data;
         for (unsigned int i_v = 0; i_v < scene->mMeshes[i]->mNumVertices; i_v++) {
-            new_mesh.vertices.push_back(scene->mMeshes[i]->mVertices[i_v].x);
-            new_mesh.vertices.push_back(scene->mMeshes[i]->mVertices[i_v].y);
-            new_mesh.vertices.push_back(scene->mMeshes[i]->mVertices[i_v].z);
+            mesh_data.push_back(scene->mMeshes[i]->mVertices[i_v].x);
+            mesh_data.push_back(scene->mMeshes[i]->mVertices[i_v].y);
+            mesh_data.push_back(scene->mMeshes[i]->mVertices[i_v].z);
 
-            new_mesh.normals.push_back(scene->mMeshes[i]->mNormals[i_v].x);
-            new_mesh.normals.push_back(scene->mMeshes[i]->mNormals[i_v].y);
-            new_mesh.normals.push_back(scene->mMeshes[i]->mNormals[i_v].z);
+            mesh_data.push_back(scene->mMeshes[i]->mNormals[i_v].x);
+            mesh_data.push_back(scene->mMeshes[i]->mNormals[i_v].y);
+            mesh_data.push_back(scene->mMeshes[i]->mNormals[i_v].z);
 
-            new_mesh.uvs.push_back(scene->mMeshes[i]->mTextureCoords[0][i_v].x);
-            new_mesh.uvs.push_back(scene->mMeshes[i]->mTextureCoords[0][i_v].y);
+            mesh_data.push_back(scene->mMeshes[i]->mTextureCoords[0][i_v].x);
+            mesh_data.push_back(scene->mMeshes[i]->mTextureCoords[0][i_v].y);
         }
         for (unsigned int i_i = 0; i_i < scene->mMeshes[i]->mNumFaces; i_i++) {
             for (unsigned int n_face = 0; n_face < scene->mMeshes[i]->mFaces[i_i].mNumIndices; n_face++) {
-                new_mesh.indices.push_back(scene->mMeshes[i]->mFaces[i_i].mIndices[n_face]);
+                index_data.push_back(scene->mMeshes[i]->mFaces[i_i].mIndices[n_face]);
             }
         }
-        meshes_.push_back(std::move(new_mesh));
+        meshes_.emplace_back(mesh_data, index_data);
     }
 
     // Load nodes
@@ -70,12 +71,13 @@ void Model::render(const Transform& model_transform) const {
     }
 }
 
-void Node::render(const Transform& parent_transform, const std::vector<MeshTemp>& mesh_ref) const {
+void Node::render(const Transform& parent_transform, const std::vector<Mesh>& mesh_ref) const {
     Transform this_trans = parent_transform * transform_;
 
     // Do render stuff
     for (auto mesh_index : mesh_indices_) {
-        const MeshTemp& this_mesh = mesh_ref[mesh_index];
+        const Mesh& this_mesh = mesh_ref[mesh_index];
+        this_mesh.draw();
     }
 
     for (auto child : children_) {
@@ -83,4 +85,80 @@ void Node::render(const Transform& parent_transform, const std::vector<MeshTemp>
     }
 }
 
+Mesh::~Mesh() noexcept {
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+    glDeleteVertexArrays(1, &VAO);
+}
+
+void Mesh::gl_init() {
+    // VAO setup
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
+    // VBO/EBO setup
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(
+        GL_ARRAY_BUFFER,
+        mesh_data.size() * sizeof(float),
+        mesh_data.data(),
+        GL_STATIC_DRAW
+    );
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(
+        GL_ELEMENT_ARRAY_BUFFER,
+        index_count_ * sizeof(int),
+        indices.data(),
+        GL_STATIC_DRAW
+    );
+
+    // Position attribute
+    glVertexAttribPointer(
+        0,
+        3,
+        GL_FLOAT,
+        GL_FALSE,
+        8 * sizeof(float),
+        (void*)0  // Starting at index 0
+    );
+    glEnableVertexAttribArray(0);
+
+    // Normal attribute
+    glVertexAttribPointer(
+        1,
+        3,
+        GL_FLOAT,
+        GL_FALSE,
+        8 * sizeof(float),
+        (void*)(3*sizeof(float))  // offset by 3 preceding pos floats
+    );
+    glEnableVertexAttribArray(1);
+
+    // UV attribute
+    glVertexAttribPointer(
+        2,
+        2,
+        GL_FLOAT,
+        GL_FALSE,
+        8 * sizeof(float),
+        (void*)(6*sizeof(float))  // offset by 3 preceding normal floats
+    );
+    glEnableVertexAttribArray(2);
+
+    glBindVertexArray(0);  // unset VAO
+}
+
+void Mesh::draw() const {
+    glBindVertexArray(VAO);
+    glDrawElements(
+        GL_TRIANGLES,
+        index_count_,
+        GL_UNSIGNED_INT,
+        0
+    );
+}
 }
