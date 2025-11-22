@@ -7,9 +7,6 @@
 #include "objects/GameObject.hpp"
 #include "utilities/Vector.hpp"
 #include "utilities/Input.hpp"
-#include "utilities/Utils.hpp"
-
-#include "game/Globals.hpp"
 
 class LightSource : public GameObject {
 public:

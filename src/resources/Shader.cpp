@@ -1,4 +1,14 @@
+
+#include <fstream>
+#include <sstream>
+#include <iostream>
+
+#include <OpenGL/gl3.h>
+#include <glm/gtc/type_ptr.hpp>
+
 #include "resources/Shader.hpp"
+
+
 
 std::string load_shader_source_from_file(const std::string& shader_path) {
     std::string shader_code;
