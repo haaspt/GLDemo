@@ -17,8 +17,6 @@
 #include "resources/ResourceManager.hpp"
 #include "resources/Model.hpp"
 
-#include "game/Cube.hpp"
-#include "game/Pyramid.hpp"
 #include "game/LightSource.hpp"
 
 constexpr unsigned int W_WIDTH = 800;
@@ -73,30 +71,20 @@ int main(int /*argc*/, char** argv) {
 
     auto model_path = Utils::exe_dir_path_from_argv0(argv[0]) / "models/test.gltf";
     Model::Model model(model_path);
+    Shader* raw_shader = Managers::shader_manager().get("default");
+    Texture* raw_texture = Managers::texture_manager().get("default.jpg");
 
     // Camera Setup
     Camera camera(55.0, static_cast<double>(W_WIDTH) / W_HEIGHT, 0.1, 500.0);
-    camera.set_position(-1.0, 1.25, -3.0);
-    camera.set_pitch(-25);
+    camera.set_position(-1.0, 0.75, -3.0);
+    camera.set_pitch(-10);
     camera.set_yaw(75);
 
-    // World setup
-    std::vector<std::unique_ptr<GameObject>> entities;
 
     auto light_source = LightSource();
     light_source.set_position(-1.5, 0.75, 0.0);
     light_source.set_scale(0.125, 0.125, 0.125);
     light_source.rotate_deg({180, 0, 0});
-
-    // auto cube = std::make_unique<Cube>();
-    // cube->set_position(0, 0, 0);
-    // cube->set_material_color({1.0, 0.5, 0.31});
-    // entities.push_back(std::move(cube));
-    //
-    // auto pyramid = std::make_unique<Pyramid>();
-    // pyramid->set_position(2.0, -1.5, -1.5);
-    // pyramid->set_material_color({0.5, 0.31, 1.0});
-    // entities.push_back(std::move(pyramid));
 
     
     double delta_t = 0.0;
@@ -106,8 +94,6 @@ int main(int /*argc*/, char** argv) {
     double time_to_next_frame_ms = 0.0;
 
     Utils::CircularBuffer fps_history(100);
-
-    Shader* raw_shader = Managers::shader_manager().get("default");
     
     // Main loop
     while (!glfwWindowShouldClose(window)) {
@@ -149,32 +135,17 @@ int main(int /*argc*/, char** argv) {
         light_source.update(delta_t);
         light_source.render(camera);
 
-        for (const auto& object : entities) {
-            ImGui::BulletText("Object: %d; x: %.2f, y:%.2f, z: %.2f\n\t rx:%.2f, ry:%.2f, rz:%.2f",
-                object->get_id(),
-                object->get_position().x,
-                object->get_position().y,
-                object->get_position().z,
-                object->get_rotation_deg().x,
-                object->get_rotation_deg().y,
-                object->get_rotation_deg().z
-                );
-            
-            object->set_light_pos(light_source.get_position());
-            
-            object->update(delta_t);
-            object->render(camera);
-        }
-
         raw_shader->use();
-        raw_shader->set_mat4("model", Transform().rotate(Utils::to_radians(180), {0, 1, 0}).to_glm());
         raw_shader->set_mat4("view", camera.get_view_matrix().to_glm());
         raw_shader->set_mat4("projection", camera.get_projection_matrix().to_glm());
         raw_shader->set_vec3("material_color", Vector3(1.0).to_glm());
         raw_shader->set_vec3("light_color", Vector3(1.0).to_glm());
         raw_shader->set_vec3("light_pos", light_source.get_position().to_glm());
         raw_shader->set_vec3("view_pos", camera.get_position().to_glm());
-        model.render(Transform());
+        raw_shader->set_bool("useTexture", false);
+        raw_shader->set_int("albedoTex", 0);
+        raw_texture->bind(0);
+        model.render(Transform().rotate(Utils::to_radians(180), {0, 1, 0}), *raw_shader);
 
         ImGui::EndChild();
         ImGui::Render();

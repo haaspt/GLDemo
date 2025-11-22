@@ -40,7 +40,8 @@ Model::Model(const std::string& model_path) {
     // Load meshes
     for (unsigned int i = 0; i < scene->mNumMeshes; i++) {
         std::vector<float> mesh_data;
-        std::vector<unsigned int> index_data;
+        mesh_data.reserve(scene->mMeshes[i]->mNumVertices * 8);
+
         for (unsigned int i_v = 0; i_v < scene->mMeshes[i]->mNumVertices; i_v++) {
             mesh_data.push_back(scene->mMeshes[i]->mVertices[i_v].x);
             mesh_data.push_back(scene->mMeshes[i]->mVertices[i_v].y);
@@ -50,9 +51,17 @@ Model::Model(const std::string& model_path) {
             mesh_data.push_back(scene->mMeshes[i]->mNormals[i_v].y);
             mesh_data.push_back(scene->mMeshes[i]->mNormals[i_v].z);
 
-            mesh_data.push_back(scene->mMeshes[i]->mTextureCoords[0][i_v].x);
-            mesh_data.push_back(scene->mMeshes[i]->mTextureCoords[0][i_v].y);
+            if (scene->mMeshes[i]->mTextureCoords[0]) {
+                mesh_data.push_back(scene->mMeshes[i]->mTextureCoords[0][i_v].x);
+                mesh_data.push_back(scene->mMeshes[i]->mTextureCoords[0][i_v].y);
+            } else {
+                mesh_data.push_back(0.0f);
+                mesh_data.push_back(0.0f);
+            }
+
         }
+        std::vector<unsigned int> index_data;
+
         for (unsigned int i_i = 0; i_i < scene->mMeshes[i]->mNumFaces; i_i++) {
             for (unsigned int n_face = 0; n_face < scene->mMeshes[i]->mFaces[i_i].mNumIndices; n_face++) {
                 index_data.push_back(scene->mMeshes[i]->mFaces[i_i].mIndices[n_face]);
@@ -65,23 +74,24 @@ Model::Model(const std::string& model_path) {
     root_node_ = create_node_tree(scene->mRootNode);
 }
 
-void Model::render(const Transform& model_transform) const {
+void Model::render(const Transform& model_transform, const Shader& shader_ref) const {
     if (root_node_) {
-        root_node_->render(model_transform, meshes_);
+        root_node_->render(model_transform, meshes_, shader_ref);
     }
 }
 
-void Node::render(const Transform& parent_transform, const std::vector<Mesh>& mesh_ref) const {
+void Node::render(const Transform& parent_transform, const std::vector<Mesh>& mesh_ref, const Shader& shader_ref) const {
     Transform this_trans = parent_transform * transform_;
 
-    // Do render stuff
+    shader_ref.set_mat4("model", this_trans.to_glm());
+
     for (auto mesh_index : mesh_indices_) {
         const Mesh& this_mesh = mesh_ref[mesh_index];
         this_mesh.draw();
     }
 
     for (auto child : children_) {
-        child->render(this_trans, mesh_ref);
+        child->render(this_trans, mesh_ref, shader_ref);
     }
 }
 
@@ -111,7 +121,7 @@ void Mesh::gl_init() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(
         GL_ELEMENT_ARRAY_BUFFER,
-        index_count_ * sizeof(int),
+        index_count_ * sizeof(unsigned int),
         indices.data(),
         GL_STATIC_DRAW
     );
@@ -145,10 +155,11 @@ void Mesh::gl_init() {
         GL_FLOAT,
         GL_FALSE,
         8 * sizeof(float),
-        (void*)(6*sizeof(float))  // offset by 3 preceding normal floats
+        (void*)(6*sizeof(float))
     );
     glEnableVertexAttribArray(2);
 
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);  // unset VAO
 }
 
@@ -160,5 +171,6 @@ void Mesh::draw() const {
         GL_UNSIGNED_INT,
         0
     );
+    glBindVertexArray(0);
 }
 }

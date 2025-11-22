@@ -91,4 +91,5 @@ void Mesh::draw() const {
         GL_UNSIGNED_INT,
         0
     );
+    glBindVertexArray(0);
 }
