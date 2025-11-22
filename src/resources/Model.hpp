@@ -7,7 +7,6 @@
 #include <vector>
 #include <string>
 
-#include <assimp/matrix4x4.h>
 #include <OpenGL/gl3.h>
 
 #include "resources/Shader.hpp"
@@ -95,7 +94,7 @@ namespace Model {
         explicit Node(unsigned int index) : mesh_indices_{index}, transform_(Transform()) {
         };
 
-        Node(unsigned int index, const aiMatrix4x4& ai_transform) : mesh_indices_{index}, transform_(ai_transform) {
+        Node(unsigned int index, const Transform& transform) : mesh_indices_{index}, transform_(transform) {
         };
 
         Node(std::vector<unsigned int> indices, const aiMatrix4x4& ai_transform)
