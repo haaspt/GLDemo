@@ -30,7 +30,8 @@ void main()
     float spec = pow(max(dot(view_dir, reflect_dir), 0.0), 32);
     vec3 specular = specular_strength * spec * light_color;
 
-    vec3 base_color = useTexture ? texture(albedoTex, UV).rgb : material_color;
+    vec3 tex = useTexture ? texture(albedoTex, UV).rgb : vec3(1.0, 1.0, 1.0);
+    vec3 base_color = tex * material_color;
 
     vec3 result = (ambient + diffuse + specular) * base_color;
 
