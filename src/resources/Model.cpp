@@ -8,7 +8,76 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include "resources/ResourceManager.hpp"
+
 namespace Model {
+    Material::Material(aiMaterial* ai_material) {
+        if (ai_material->GetTextureCount(aiTextureType_DIFFUSE)) {
+            aiString texture_path;
+            ai_material->GetTexture(aiTextureType_DIFFUSE, 0, &texture_path);
+            std::filesystem::path path = texture_path.C_Str();
+            texture_name_ = path.filename();  // for now just assume it's always in the /texture/ folder
+            texture_ = Managers::texture_manager().get(texture_name_);
+        }
+
+        // TODO Blender uses PBR, not Phong lighting
+        // For now this is the best we can do
+        aiColor3D ambient, diffuse, specular;
+        float shininess;
+        // ai_material->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
+        ai_material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
+        // ai_material->Get(AI_MATKEY_COLOR_SPECULAR, specular);
+        ai_material->Get(AI_MATKEY_SHININESS, shininess);
+
+        // ambient_.x = ambient.r;
+        // ambient_.y = ambient.g;
+        // ambient_.z = ambient.b;
+
+        diffuse_.x = diffuse.r;
+        diffuse_.y = diffuse.g;
+        diffuse_.z = diffuse.b;
+
+        float target = 0.05;
+        float blend = 0.9f;
+        ambient_.x = diffuse.r + (target - diffuse.r) * blend;
+        ambient_.y = diffuse.g + (target - diffuse.g) * blend;
+        ambient_.z = diffuse.b + (target - diffuse.b) * blend;
+
+        specular_ = Vector3(1.0);
+
+        // specular_.x = specular.r;
+        // specular_.y = specular.g;
+        // specular_.z = specular.b;
+
+        shininess_ = shininess;
+    }
+
+    Material::~Material() noexcept {
+        if (texture_) {
+            Managers::texture_manager().release(texture_name_);
+        }
+    }
+
+    Material::Material(Material&& other) noexcept
+        : texture_(other.texture_), texture_name_(std::move(other.texture_name_)) {
+        other.texture_ = nullptr;
+    }
+
+    Material& Material::operator=(Material&& other) noexcept {
+        if (this != &other) {
+            Managers::texture_manager().release(texture_name_);
+
+            texture_ = other.texture_;
+            texture_name_ = std::move(other.texture_name_);
+
+            other.texture_ = nullptr;
+        }
+        return *this;
+    }
+
+
+
+
     Node* create_node_tree(aiNode* ai_node) {
         std::vector<unsigned int> mesh_indices;
         mesh_indices.reserve(ai_node->mNumMeshes);
@@ -37,6 +106,12 @@ namespace Model {
             throw std::runtime_error(
                 std::string("Error during model loading: ") + importer.GetErrorString()
             );
+        }
+
+
+        materials_.reserve(scene->mNumMaterials);
+        for (unsigned int i = 0; i < scene->mNumMaterials; i++) {
+            materials_.emplace_back(scene->mMaterials[i]);
         }
 
         // Load meshes
@@ -68,7 +143,8 @@ namespace Model {
                     index_data.push_back(scene->mMeshes[i]->mFaces[i_i].mIndices[n_face]);
                 }
             }
-            meshes_.emplace_back(mesh_data, index_data);
+
+            meshes_.emplace_back(mesh_data, index_data, scene->mMeshes[i]->mMaterialIndex);
         }
 
         // Load nodes
@@ -77,23 +153,35 @@ namespace Model {
 
     void Model::render(const Transform& model_transform, const Shader& shader_ref) const {
         if (root_node_) {
-            root_node_->render(model_transform, meshes_, shader_ref);
+            root_node_->render(model_transform, meshes_, materials_, shader_ref);
         }
     }
 
     void Node::render(const Transform& parent_transform, const std::vector<Mesh>& mesh_ref,
-                      const Shader& shader_ref) const {
+                      const std::vector<Material>& mat_ref, const Shader& shader_ref) const {
         Transform this_trans = parent_transform * transform_;
 
         shader_ref.set_mat4("model", this_trans.to_glm());
 
         for (auto mesh_index: mesh_indices_) {
             const Mesh& this_mesh = mesh_ref[mesh_index];
+            const Material& this_mat = mat_ref[this_mesh.get_material_index()];
+            if (this_mat.has_texture()) {
+                shader_ref.set_bool("useTexture", true);
+                shader_ref.set_int("albedoTex", 0);
+                this_mat.get_texture()->bind(0);
+            } else {
+                shader_ref.set_bool("useTexture", false);
+            }
+            shader_ref.set_vec3("material_ambient", this_mat.get_ambient().to_glm());
+            shader_ref.set_vec3("material_diffuse", this_mat.get_diffuse().to_glm());
+            shader_ref.set_vec3("material_specular", this_mat.get_specular().to_glm());
+            shader_ref.set_float("material_shininess", this_mat.get_shininess());
             this_mesh.draw();
         }
 
         for (auto child: children_) {
-            child->render(this_trans, mesh_ref, shader_ref);
+            child->render(this_trans, mesh_ref, mat_ref, shader_ref);
         }
     }
 

@@ -70,10 +70,9 @@ int main(int /*argc*/, char** argv) {
     Managers::initialize(Utils::exe_dir_path_from_argv0(argv[0]));
     Input::initialize(window);
 
-    auto model_path = Utils::exe_dir_path_from_argv0(argv[0]) / "models/test.gltf";
+    auto model_path = Utils::exe_dir_path_from_argv0(argv[0]) / "models/suzanne.gltf";
     Model::Model model(model_path);
     Shader* raw_shader = Managers::shader_manager().get("default");
-    Texture* raw_texture = Managers::texture_manager().get("default.jpg");
 
     // Camera Setup
     Camera camera(55.0, static_cast<double>(W_WIDTH) / W_HEIGHT, 0.1, 500.0);
@@ -139,13 +138,9 @@ int main(int /*argc*/, char** argv) {
         raw_shader->use();
         raw_shader->set_mat4("view", camera.get_view_matrix().to_glm());
         raw_shader->set_mat4("projection", camera.get_projection_matrix().to_glm());
-        raw_shader->set_vec3("material_color", Vector3(1.0).to_glm());
         raw_shader->set_vec3("light_color", Vector3(1.0).to_glm());
         raw_shader->set_vec3("light_pos", light_source.get_position().to_glm());
         raw_shader->set_vec3("view_pos", camera.get_position().to_glm());
-        raw_shader->set_bool("useTexture", false);
-        raw_shader->set_int("albedoTex", 0);
-        raw_texture->bind(0);
         model.render(Transform().rotate(Utils::to_radians(180), {0, 1, 0}), *raw_shader);
 
         ImGui::EndChild();
