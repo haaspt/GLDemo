@@ -76,8 +76,6 @@ namespace Model {
     }
 
 
-
-
     Node* create_node_tree(aiNode* ai_node) {
         std::vector<unsigned int> mesh_indices;
         mesh_indices.reserve(ai_node->mNumMeshes);

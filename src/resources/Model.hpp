@@ -23,14 +23,18 @@ namespace Model {
         Vector3 diffuse_;
         Vector3 specular_;
         float shininess_;
+
     public:
         explicit Material(aiMaterial* ai_material);
+
         ~Material() noexcept;
 
         Material(const Material&) = delete;
+
         Material& operator=(const Material&) = delete;
 
         Material(Material&& other) noexcept;
+
         Material& operator=(Material&& other) noexcept;
 
         bool has_texture() const { return texture_ != nullptr; }
@@ -41,6 +45,7 @@ namespace Model {
         Vector3 get_specular() const { return specular_; }
         float get_shininess() const { return shininess_; }
     };
+
     class Mesh {
     private:
         GLuint VAO = 0;
@@ -111,7 +116,8 @@ namespace Model {
             return *this;
         }
 
-        unsigned int get_material_index() const {return material_index_; }
+        unsigned int get_material_index() const { return material_index_; }
+
         void draw() const;
     };
 
@@ -123,7 +129,7 @@ namespace Model {
 
     public:
         Node(std::vector<unsigned int> mesh_indices,
-            const aiMatrix4x4& ai_transform)
+             const aiMatrix4x4& ai_transform)
             : mesh_indices_(std::move(mesh_indices)),
               transform_(ai_transform) {
         };
