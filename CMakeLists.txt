@@ -106,6 +106,7 @@ add_executable(GLDemo
         src/objects/LightSource.cpp
         src/objects/LightSource.hpp
         src/objects/RenderedObject.hpp
+        src/controllers/BaseController.hpp
 )
 
 target_include_directories(GLDemo PRIVATE ${CMAKE_SOURCE_DIR}/src)

@@ -12,8 +12,8 @@ private:
     float ambient_strength = 1;
 
 public:
-    LightSource(const std::string& model_name, const Vector3& color, float ambient_strength)
-        : RenderedObject(model_name, "light_source"),
+    LightSource(const std::string& model_name, const Vector3& color, float ambient_strength, std::unique_ptr<BaseController> controller = {})
+        : RenderedObject(model_name, "light_source", std::move(controller)),
           color(color),
           ambient_strength(ambient_strength) {};
 
