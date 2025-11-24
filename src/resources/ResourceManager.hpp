@@ -13,6 +13,7 @@
 
 #include "resources/Shader.hpp"
 #include "resources/Mesh.hpp"
+#include "resources/Model.hpp"
 #include "resources/Texture.hpp"
 
 using json = nlohmann::json;
@@ -117,9 +118,27 @@ struct TextureLoader {
     }
 };
 
+struct ModelLoader {
+    const std::filesystem::path model_dir;
+
+    explicit ModelLoader(const std::string& model_dir) : model_dir(model_dir) {}
+
+    Model::Model* load(const std::string& model_name) {
+        const auto model_file_path = model_dir / model_name;
+
+        Model::Model* new_model = new Model::Model(model_file_path);
+        return new_model;
+    }
+
+    void unload(Model::Model* model) noexcept {
+        delete model;
+    }
+};
+
 using ShaderManager = ResourceManager<Shader, ShaderLoader>;
 using MeshManager = ResourceManager<Mesh, MeshLoader>;
 using TextureManager = ResourceManager<Texture, TextureLoader>;
+using ModelManager = ResourceManager<Model::Model, ModelLoader>;
 
 class Managers {
 private:
@@ -153,6 +172,14 @@ public:
             throw std::runtime_error("Managers not initialized! Call Managers::initialize() first.");
         }
         static TextureManager instance(TextureLoader(exe_dir_path / "textures"));
+        return instance;
+    }
+
+    static ModelManager& model_manager() {
+        if (!initialized) {
+            throw std::runtime_error("Managers not initialized! Call Managers::initialize() first.");
+        }
+        static ModelManager instance(ModelLoader(exe_dir_path / "models"));
         return instance;
     }
 };
