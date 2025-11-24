@@ -10,11 +10,11 @@ const Transform& Node::get_transform() const {
 void Node::update_transform() const {
     transform = Transform(1.0);
 
-    transform.translate(position);
-
     transform.rotate(rotation_rad.y, Vector3(0, 1, 0));
     transform.rotate(rotation_rad.x, Vector3(1, 0, 0));
     transform.rotate(rotation_rad.z, Vector3(0, 0, 1));
+
+    transform.translate(position);
 
     transform.scale(scale);
     is_transform_dirty = false;

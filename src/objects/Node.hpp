@@ -18,8 +18,6 @@ protected:
     Vector3 scale = Vector3(1.0);
     Vector3 rotation_rad = Vector3(0.0);
 
-    const Transform& get_transform() const;
-
     void set_dirty_flag() const { is_transform_dirty = true; }
 
     virtual void process(double const/*delta_t*/) {
@@ -129,4 +127,6 @@ public:
     void rotate_deg(double const x_deg, double const y_deg, double const z_deg) {
         rotate_rad(Vector3(x_deg, y_deg, z_deg).to_radians());
     }
+
+    const Transform& get_transform() const;
 };
