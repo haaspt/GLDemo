@@ -17,3 +17,9 @@ void GameObject::render(const Camera& camera, const std::vector<LightSource*>& l
     }
     model->render(get_transform(), *shader);
 }
+
+void GameObject::process(double delta_t) {
+    if (controller) {
+        controller->update(*this, delta_t);
+    }
+}

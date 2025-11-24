@@ -4,6 +4,7 @@
 
 #pragma once
 #include "GameObject.hpp"
+#include "objects/Camera.hpp"
 
 
 class LightSource : public RenderedObject {
@@ -12,10 +13,12 @@ private:
     float ambient_strength = 1;
 
 public:
-    LightSource(const std::string& model_name, const Vector3& color, float ambient_strength, std::unique_ptr<BaseController> controller = {})
+    LightSource(const std::string& model_name, const Vector3& color, float ambient_strength,
+                std::unique_ptr<BaseController> controller = {})
         : RenderedObject(model_name, "light_source", std::move(controller)),
           color(color),
-          ambient_strength(ambient_strength) {};
+          ambient_strength(ambient_strength) {
+    };
 
     Vector3 get_color() const { return color; }
     void set_color(const Vector3& new_color) { color = new_color; }

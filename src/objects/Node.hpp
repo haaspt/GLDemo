@@ -1,7 +1,5 @@
 #pragma once
 
-#include <unordered_map>
-
 #include "utilities/Vector.hpp"
 #include "utilities/Utils.hpp"
 
@@ -43,7 +41,7 @@ public:
 
     unsigned int get_id() const { return id; }
 
-    void update(double delta_t);
+    virtual void update(double delta_t);
 
     Vector3 get_velocity() const {
         return velocity;

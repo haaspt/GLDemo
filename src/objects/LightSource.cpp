@@ -3,7 +3,6 @@
 //
 
 #include "LightSource.hpp"
-#include "objects/Camera.hpp"
 
 void LightSource::render(const Camera& camera, const std::vector<LightSource*>&) const {
     shader->use();

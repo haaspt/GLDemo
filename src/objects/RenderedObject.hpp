@@ -25,7 +25,8 @@ protected:
     std::string texture_name;
 
 public:
-    RenderedObject(const std::string& model_name, const std::string& shader_name, std::unique_ptr<BaseController> controller = {})
+    RenderedObject(const std::string& model_name, const std::string& shader_name,
+                   std::unique_ptr<BaseController> controller = {})
         : controller(std::move(controller)), model_name(model_name), shader_name(shader_name) {
         model = Managers::model_manager().get(model_name);
         shader = Managers::shader_manager().get(shader_name);
