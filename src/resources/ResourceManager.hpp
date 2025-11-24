@@ -7,16 +7,10 @@
 #include <unordered_map>
 #include <string>
 #include <filesystem>
-#include <fstream>
-
-#include <nlohmann/json.hpp>
 
 #include "resources/Shader.hpp"
-#include "resources/Mesh.hpp"
 #include "resources/Model.hpp"
 #include "resources/Texture.hpp"
-
-using json = nlohmann::json;
 
 template<class Resource, class Loader>
 class ResourceManager {
@@ -79,27 +73,6 @@ struct ShaderLoader {
     }
 };
 
-struct MeshLoader {
-    const std::filesystem::path model_dir;
-
-    explicit MeshLoader(const std::string& model_dir) : model_dir(model_dir) {
-    };
-
-    Mesh* load(const std::string& model_name) {
-        const auto model_json_path = model_dir / (model_name + ".json");
-
-        std::ifstream file(model_json_path);
-        json json_data = json::parse(file);
-
-        Mesh* new_mesh = new Mesh(json_data);
-        return new_mesh;
-    }
-
-    void unload(Mesh* mesh) noexcept {
-        delete mesh;
-    }
-};
-
 struct TextureLoader {
     const std::filesystem::path texture_dir;
 
@@ -136,7 +109,6 @@ struct ModelLoader {
 };
 
 using ShaderManager = ResourceManager<Shader, ShaderLoader>;
-using MeshManager = ResourceManager<Mesh, MeshLoader>;
 using TextureManager = ResourceManager<Texture, TextureLoader>;
 using ModelManager = ResourceManager<Model::Model, ModelLoader>;
 
@@ -159,13 +131,6 @@ public:
         return instance;
     }
 
-    static MeshManager& mesh_manager() {
-        if (!initialized) {
-            throw std::runtime_error("Managers not initialized! Call Managers::initialize() first.");
-        }
-        static MeshManager instance(MeshLoader(exe_dir_path / "models"));
-        return instance;
-    }
 
     static TextureManager& texture_manager() {
         if (!initialized) {

@@ -10,13 +10,11 @@
 
 #include "objects/Camera.hpp"
 #include "objects/GameObject.hpp"
-#include "utilities/Utils.hpp"
+#include "objects/LightSource.hpp"
 #include "utilities/Input.hpp"
 #include "utilities/Vector.hpp"
 #include "resources/ResourceManager.hpp"
-#include "resources/Model.hpp"
 
-#include "game/LightSource.hpp"
 
 constexpr unsigned int W_WIDTH = 800;
 constexpr unsigned int W_HEIGHT = 600;
@@ -70,9 +68,8 @@ int main(int /*argc*/, char** argv) {
     Managers::initialize(Utils::exe_dir_path_from_argv0(argv[0]));
     Input::initialize(window);
 
-    auto model_path = Utils::exe_dir_path_from_argv0(argv[0]) / "models/suzanne.gltf";
-    Model::Model model(model_path);
-    Shader* raw_shader = Managers::shader_manager().get("default");
+    auto suzanne = GameObject("suzanne.gltf", "default");
+    suzanne.rotate_deg(0, 180, 0);
 
     // Camera Setup
     Camera camera(55.0, static_cast<double>(W_WIDTH) / W_HEIGHT, 0.1, 500.0);
@@ -81,10 +78,10 @@ int main(int /*argc*/, char** argv) {
     camera.set_yaw(75);
 
 
-    auto light_source = LightSource();
-    light_source.set_position(-1.5, 0.75, 0.0);
-    light_source.set_scale(0.125, 0.125, 0.125);
-    light_source.rotate_deg({180, 0, 0});
+    auto light_source = LightSource("sphere.gltf", Vector3{1.0}, 0.4);
+    light_source.set_position(-1.75, 0, -1.75);
+    //light_source.set_scale(0.125, 0.125, 0.125);
+    //light_source.rotate_deg({180, 0, 0});
 
 
     double delta_t = 0.0;
@@ -109,7 +106,7 @@ int main(int /*argc*/, char** argv) {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        fps_history.push(1.0f / delta_t);
+        fps_history.push(1.0 / delta_t);
 
         ImGui::Text("Mean FPS: %.1f", fps_history.average_value(20));
         ImGui::Text("Min FPS: %.1f", fps_history.min_value(20));
@@ -128,25 +125,45 @@ int main(int /*argc*/, char** argv) {
 
         ImGui::Separator();
 
+        float ambient_strength = light_source.get_strength();
+        ImGui::SliderFloat("Ambient Strength", &ambient_strength, 0.0f, 1.0f);
+
+        ImGui::Separator();
+
         ImGui::Text("World Objects:");
         ImGui::BeginChild("Scrolling");
 
-        float ambient_strength = 0.4f;
 
-        ImGui::SliderFloat("Ambient Strength", &ambient_strength, 0.0f, 4.0f);
+        Vector3 current_light_pos = light_source.get_position();
+        float light_pos_array[3] = {
+            static_cast<float>(current_light_pos.x),
+            static_cast<float>(current_light_pos.y),
+            static_cast<float>(current_light_pos.z)
+        };
+        ImGui::SliderFloat3("Light Pos", light_pos_array, -5, 5);
+
 
         // Render Loop
+        light_source.set_strength(ambient_strength);
+        light_source.set_position({light_pos_array[0], light_pos_array[1], light_pos_array[2]});
         light_source.update(delta_t);
-        light_source.render(camera);
+        light_source.render(camera, {});
 
-        raw_shader->use();
-        raw_shader->set_mat4("view", camera.get_view_matrix().to_glm());
-        raw_shader->set_mat4("projection", camera.get_projection_matrix().to_glm());
-        raw_shader->set_vec3("light_color", Vector3(1.0).to_glm());
-        raw_shader->set_vec3("light_pos", light_source.get_position().to_glm());
-        raw_shader->set_float("ambient_strength", ambient_strength);
-        raw_shader->set_vec3("view_pos", camera.get_position().to_glm());
-        model.render(Transform().rotate(Utils::to_radians(180), {0, 1, 0}), *raw_shader);
+        Vector3 current_model_rot = suzanne.get_rotation_deg();
+        float model_rot_array[3] = {
+            static_cast<float>(current_model_rot.x),
+            static_cast<float>(current_model_rot.y),
+            static_cast<float>(current_model_rot.z)
+        };
+        ImGui::SliderFloat3("Model Rot.", model_rot_array, -180, 180);
+
+        suzanne.set_rotation_deg({
+            model_rot_array[0],
+            model_rot_array[1],
+            model_rot_array[2]
+        });
+        suzanne.update(delta_t);
+        suzanne.render(camera, {&light_source});
 
         ImGui::EndChild();
         ImGui::Render();

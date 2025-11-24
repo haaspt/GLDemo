@@ -37,13 +37,6 @@ set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(ASSIMP_INJECT_DEBUG_POSTFIX OFF CACHE BOOL "" FORCE)
 set(ASSIMP_INSTALL OFF CACHE BOOL "" FORCE)
 
-
-# nlohmann/json exports target nlohmann_json::nlohmann_json
-FetchContent_Declare(json
-  URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz
-  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-)
-
 # --- stb_image (header-only) ---
 FetchContent_Declare(stb
   GIT_REPOSITORY https://github.com/nothings/stb.git
@@ -85,19 +78,16 @@ if(NOT imgui_POPULATED)
   target_link_libraries(imgui PUBLIC glfw OpenGL::GL)
 endif()
 
-FetchContent_MakeAvailable(glfw glm assimp json imgui googletest)
+FetchContent_MakeAvailable(glfw glm assimp  imgui googletest)
 
 # OpenGL linking (portable)
 find_package(OpenGL REQUIRED)
 
 add_executable(GLDemo
   src/main.cpp
-  src/resources/Mesh.cpp
-  src/resources/Mesh.hpp
-  src/resources/Shader.cpp
+        src/resources/Shader.cpp
   src/resources/Shader.hpp
-  src/resources/Texture.hpp
-  src/objects/GameObject.cpp
+        src/objects/GameObject.cpp
   src/objects/GameObject.hpp
   src/objects/Camera.hpp
   src/utilities/Input.cpp
@@ -109,14 +99,13 @@ add_executable(GLDemo
   src/resources/ResourceManager.hpp
   src/objects/Node.cpp
   src/objects/Node.hpp
-  src/game/Pyramid.cpp
-  src/game/Pyramid.hpp
-  src/game/Globals.hpp
-  src/game/Cube.cpp
-  src/game/Cube.hpp
-  src/third_party/stb_image_impl.cpp
+        src/game/Globals.hpp
+        src/third_party/stb_image_impl.cpp
   src/resources/Model.cpp
   src/resources/Model.hpp
+        src/objects/LightSource.cpp
+        src/objects/LightSource.hpp
+        src/objects/RenderedObject.hpp
 )
 
 target_include_directories(GLDemo PRIVATE ${CMAKE_SOURCE_DIR}/src)
@@ -128,7 +117,6 @@ target_link_libraries(GLDemo PRIVATE
   glfw
   assimp::assimp
   glm::glm
-  nlohmann_json::nlohmann_json
   imgui
   OpenGL::GL
 )
