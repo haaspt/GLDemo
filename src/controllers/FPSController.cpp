@@ -23,12 +23,17 @@ void FPSController::update(Node& node, double delta_t) {
 
     const Transform& trans = node.get_transform();
 
-    Vector3 forward{trans.at(2,0), trans.at(2, 1), trans.at(2, 2)};
-    int z_move_dir = Input::get_input_vec().y;
-    Vector3 lateral{trans.at(0,0), trans.at(0, 1), trans.at(0, 2)};
-    int x_move_dir = -Input::get_input_vec().x;
-    Vector3 current_pos = node.get_position();
-    Vector3 new_position = current_pos + ((forward * z_move_dir + lateral * x_move_dir) * delta_t * move_speed);
-    node.set_position(new_position);
+    Vector3 right = Vector3(trans.at(0, 0), trans.at(0, 1), trans.at(0, 2)).normalized();
+    Vector3 up = Vector3(trans.at(1, 0), trans.at(1, 1), trans.at(1, 2)).normalized();
+    Vector3 forward = Vector3(trans.at(2, 0), trans.at(2, 1), trans.at(2, 2)).normalized();
 
+    Vector3 input_vec = Input::get_input_vec();
+    double strafe = -input_vec.x;
+    double lift = -input_vec.z;
+    double fwd = input_vec.y;
+
+    Vector3 local_vec = Vector3{strafe, lift, fwd}.normalized();
+
+    Vector3 delta_pos = (right * local_vec.x + up * local_vec.y + forward*local_vec.z) * move_speed * delta_t;
+    node.set_position(node.get_position() + delta_pos);
 }
