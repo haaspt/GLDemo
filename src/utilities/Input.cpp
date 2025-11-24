@@ -33,11 +33,11 @@ Vector3 Input::get_input_vec() {
     if (key_state == GLFW_PRESS) {
         input_vector.x += 1;  // RIGHT
     }
-    key_state = glfwGetKey(window, GLFW_KEY_UP);
+    key_state = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT);
     if (key_state == GLFW_PRESS) {
         input_vector.z += 1;  // Forward
     }
-    key_state = glfwGetKey(window, GLFW_KEY_DOWN);
+    key_state = glfwGetKey(window, GLFW_KEY_SPACE);
     if (key_state == GLFW_PRESS) {
         input_vector.z -= 1;  // Back
     }
