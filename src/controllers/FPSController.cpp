@@ -8,7 +8,7 @@
 #include "utilities/Input.hpp"
 #include "utilities/Vector.hpp"
 
-void FPSController::update(Node& node, double delta_t) {
+void FPSController::update(Node &node, double delta_t) {
     Vector2 cursor_move_vec = Input::get_cursor_vec();
     Vector3 rot_vec{0};
     rot_vec.x = cursor_move_vec.y * look_speed;
@@ -21,7 +21,7 @@ void FPSController::update(Node& node, double delta_t) {
 
     node.rotate_rad(rot_vec.x, rot_vec.y, 0.0);
 
-    const Transform& trans = node.get_transform();
+    const Transform &trans = node.get_transform();
 
     Vector3 right = Vector3(trans.at(0, 0), trans.at(0, 1), trans.at(0, 2)).normalized();
     Vector3 up = Vector3(trans.at(1, 0), trans.at(1, 1), trans.at(1, 2)).normalized();
@@ -34,6 +34,6 @@ void FPSController::update(Node& node, double delta_t) {
 
     Vector3 local_vec = Vector3{strafe, lift, fwd}.normalized();
 
-    Vector3 delta_pos = (right * local_vec.x + up * local_vec.y + forward*local_vec.z) * move_speed * delta_t;
+    Vector3 delta_pos = (right * local_vec.x + up * local_vec.y + forward * local_vec.z) * move_speed * delta_t;
     node.set_position(node.get_position() + delta_pos);
 }
