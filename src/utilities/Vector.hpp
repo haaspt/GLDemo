@@ -237,9 +237,12 @@ struct Vector3 {
     }
 
     Vector3 normalized() const {
-        Vector3 result;
+        Vector3 result(0);
 
         double mag = magnitude();
+        if (mag == 0.0) {
+            return result;
+        }
         result.x = x / mag;
         result.y = y / mag;
         result.z = z / mag;
