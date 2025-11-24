@@ -20,23 +20,18 @@ protected:
     Vector3 scale = Vector3(1.0);
     Vector3 rotation_rad = Vector3(0.0);
 
-    Node* parent_node = nullptr;
-    std::unordered_map<unsigned int, Node*> child_nodes = {};
-
-    void add_parent(Node* parent_ptr);
-
-    void reparent(Node* new_parent_ptr);
-
-    void add_child(Node* child_ptr);
-
-    void remove_child(unsigned int child_id);
-
     const Transform& get_transform() const;
 
     void set_dirty_flag() const { is_transform_dirty = true; }
 
     virtual void process(double const/*delta_t*/) {
     }
+
+public:
+    Node() : id(Utils::IdGen::get_id()) {
+    }
+
+    virtual ~Node() noexcept = default;
 
     Node(const Node&) = delete;
 
@@ -45,12 +40,6 @@ protected:
     Node(Node&&) noexcept = default;
 
     Node& operator=(Node&&) noexcept = default;
-
-public:
-    Node() : id(Utils::IdGen::get_id()) {
-    }
-
-    virtual ~Node() noexcept = default;
 
     unsigned int get_id() const { return id; }
 

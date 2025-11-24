@@ -8,11 +8,7 @@ const Transform& Node::get_transform() const {
 }
 
 void Node::update_transform() const {
-    if (parent_node) {
-        transform = parent_node->get_transform();
-    } else {
-        transform = Transform(1.0);
-    }
+    transform = Transform(1.0);
 
     transform.translate(position);
 
