@@ -5,9 +5,9 @@ in vec2 UV;
 
 out vec4 FragColor;
 
-uniform vec3 material_color;
 uniform vec3 light_color;
 uniform vec3 light_pos;
+uniform float ambient_strength;
 uniform vec3 view_pos;
 
 uniform vec3 material_ambient;
@@ -20,7 +20,7 @@ uniform sampler2D albedoTex;
 
 void main()
 {
-    vec3 ambient = material_ambient * light_color;
+    vec3 ambient = material_ambient * ambient_strength;
 
     vec3 norm = normalize(Normal);
     vec3 light_dir = normalize(light_pos - FragPos);
@@ -35,7 +35,7 @@ void main()
 
     vec3 tex = useTexture ? texture(albedoTex, UV).rgb : vec3(1.0, 1.0, 1.0);
 
-    vec3 result = (ambient + diffuse * tex + specular);
+    vec3 result = (ambient * tex + diffuse * tex + specular);
 
     FragColor = vec4(result, 1.0);
 }

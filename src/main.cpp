@@ -47,7 +47,7 @@ GLFWwindow* initWindow() {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
 
-    //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    // glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
     // ImGUI setup
     IMGUI_CHECKVERSION();
@@ -131,6 +131,10 @@ int main(int /*argc*/, char** argv) {
         ImGui::Text("World Objects:");
         ImGui::BeginChild("Scrolling");
 
+        float ambient_strength = 0.4f;
+
+        ImGui::SliderFloat("Ambient Strength", &ambient_strength, 0.0f, 4.0f);
+
         // Render Loop
         light_source.update(delta_t);
         light_source.render(camera);
@@ -140,6 +144,7 @@ int main(int /*argc*/, char** argv) {
         raw_shader->set_mat4("projection", camera.get_projection_matrix().to_glm());
         raw_shader->set_vec3("light_color", Vector3(1.0).to_glm());
         raw_shader->set_vec3("light_pos", light_source.get_position().to_glm());
+        raw_shader->set_float("ambient_strength", ambient_strength);
         raw_shader->set_vec3("view_pos", camera.get_position().to_glm());
         model.render(Transform().rotate(Utils::to_radians(180), {0, 1, 0}), *raw_shader);
 

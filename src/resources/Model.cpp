@@ -37,8 +37,8 @@ namespace Model {
         diffuse_.y = diffuse.g;
         diffuse_.z = diffuse.b;
 
-        float target = 0.05;
-        float blend = 0.9f;
+        float target = 0.4;
+        float blend = 0.4f;
         ambient_.x = diffuse.r + (target - diffuse.r) * blend;
         ambient_.y = diffuse.g + (target - diffuse.g) * blend;
         ambient_.z = diffuse.b + (target - diffuse.b) * blend;
