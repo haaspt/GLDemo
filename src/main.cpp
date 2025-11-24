@@ -64,7 +64,7 @@ int main(int /*argc*/, char** argv) {
                 static_cast<double>(W_WIDTH) / W_HEIGHT,
                 0.1,
                 500.0,
-                {0, 0, -3.0},
+                {0, 0, -6.0},
                 std::make_unique<FPSController>(5.0, 0.2)
                 );
 
