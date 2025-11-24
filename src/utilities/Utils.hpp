@@ -74,14 +74,14 @@ namespace Utils {
     };
 
     template<typename T>
-    inline int sign(T value) {
+    [[nodiscard]] int sign(T value) {
         if (value > T(0)) return 1;
         if (value < T(0)) return -1;
         return 0;
     }
 
     template<typename T>
-    inline T clamp(T value, T min, T max) {
+    [[nodiscard]] T clamp(T value, T min, T max) {
         value = std::max(value, min);
         value = std::min(value, max);
         return value;
@@ -98,15 +98,15 @@ namespace Utils {
         return dir / filename;
     }
 
-    inline double to_degrees(double rad) {
+    [[nodiscard]] inline double to_degrees(double rad) {
         return rad * RAD_TO_DEG;
     }
 
-    inline double to_radians(double deg) {
+    [[nodiscard]] inline double to_radians(double deg) {
         return deg * DEG_TO_RAD;
     }
 
-    inline double wrap_radians(double rad) {
+    [[nodiscard]] inline double wrap_radians(double rad) {
         double wrapped = std::fmod(rad, PI * 2);
         return wrapped < 0.0 ? wrapped + (PI * 2) : wrapped;
     }
