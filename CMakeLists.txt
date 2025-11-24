@@ -106,9 +106,10 @@ add_executable(GLDemo
         src/objects/LightSource.hpp
         src/objects/RenderedObject.hpp
         src/controllers/BaseController.hpp
-        src/controllers/FreeFlyController.hpp
         src/objects/Camera.cpp
         src/objects/Camera.hpp
+        src/controllers/FPSController.cpp
+        src/controllers/FPSController.hpp
 )
 
 target_include_directories(GLDemo PRIVATE ${CMAKE_SOURCE_DIR}/src)

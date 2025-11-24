@@ -14,6 +14,7 @@
 #include "utilities/Input.hpp"
 #include "utilities/Vector.hpp"
 #include "resources/ResourceManager.hpp"
+#include "controllers/FPSController.hpp"
 
 
 constexpr unsigned int W_WIDTH = 800;
@@ -72,10 +73,19 @@ int main(int /*argc*/, char** argv) {
     suzanne.rotate_deg(0, 180, 0);
 
     // Camera Setup
-    Camera camera(55.0, static_cast<double>(W_WIDTH) / W_HEIGHT, 0.1, 500.0);
-    camera.set_position(-1.0, 0.75, -3.0);
-    camera.set_pitch(-10);
-    camera.set_yaw(75);
+    // OldCamera camera(55.0, static_cast<double>(W_WIDTH) / W_HEIGHT, 0.1, 500.0);
+    // camera.set_position(-1.0, 0.75, -3.0);
+    // camera.set_pitch(-10);
+    // camera.set_yaw(75);
+
+    Camera camera(
+                55.0,
+                static_cast<double>(W_WIDTH) / W_HEIGHT,
+                0.1,
+                500.0,
+                {-1.0, 0.75, -3.0},
+                std::make_unique<FPSController>()
+                );
 
 
     auto light_source = LightSource("sphere.gltf", Vector3{1.0}, 0.4);
@@ -115,16 +125,6 @@ int main(int /*argc*/, char** argv) {
 
         ImGui::Separator();
 
-        ImGui::Text("Camera;  x: %.2f, y:%.2f, z: %.2f,\n\t pitch:%.2f, yaw:%.2f",
-                    camera.get_position().x,
-                    camera.get_position().y,
-                    camera.get_position().z,
-                    camera.get_pitch(),
-                    camera.get_yaw()
-        );
-
-        ImGui::Separator();
-
         float ambient_strength = light_source.get_strength();
         ImGui::SliderFloat("Ambient Strength", &ambient_strength, 0.0f, 1.0f);
 
@@ -144,6 +144,8 @@ int main(int /*argc*/, char** argv) {
 
 
         // Render Loop
+        camera.update(delta_t);
+
         light_source.set_strength(ambient_strength);
         light_source.set_position({light_pos_array[0], light_pos_array[1], light_pos_array[2]});
         light_source.update(delta_t);

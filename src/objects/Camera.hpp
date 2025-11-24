@@ -7,6 +7,7 @@
 #include "objects/Node.hpp"
 #include "utilities/Vector.hpp"
 #include "utilities/Utils.hpp"
+#include <controllers/BaseController.hpp>
 
 class Camera : public Node {
 private:
