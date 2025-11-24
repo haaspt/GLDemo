@@ -10,17 +10,18 @@ class LightSource : public RenderedObject {
 private:
     Vector3 color{1.0};
     float ambient_strength = 1;
+
 public:
     LightSource(const std::string& model_name, const Vector3& color, float ambient_strength)
         : RenderedObject(model_name, "light_source"),
           color(color),
           ambient_strength(ambient_strength) {};
 
-    Vector3 get_color() const {return color;}
-    void set_color(const Vector3& new_color) {color = new_color;}
+    Vector3 get_color() const { return color; }
+    void set_color(const Vector3& new_color) { color = new_color; }
 
-    float get_strength() const {return ambient_strength;}
-    void set_strength(float new_strength) {ambient_strength = new_strength;}
+    float get_strength() const { return ambient_strength; }
+    void set_strength(float new_strength) { ambient_strength = new_strength; }
 
     void render(const Camera& camera, const std::vector<LightSource*>&) const override;
 };

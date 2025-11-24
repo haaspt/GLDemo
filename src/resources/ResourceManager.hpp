@@ -94,7 +94,8 @@ struct TextureLoader {
 struct ModelLoader {
     const std::filesystem::path model_dir;
 
-    explicit ModelLoader(const std::string& model_dir) : model_dir(model_dir) {}
+    explicit ModelLoader(const std::string& model_dir) : model_dir(model_dir) {
+    }
 
     Model::Model* load(const std::string& model_name) {
         const auto model_file_path = model_dir / model_name;
