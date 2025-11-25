@@ -9,7 +9,7 @@
 
 #include "math/Vector.hpp"
 
-class Quaternion;
+struct Quaternion;
 
 
 struct Transform {

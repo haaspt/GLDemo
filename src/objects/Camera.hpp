@@ -5,7 +5,7 @@
 #pragma once
 
 #include "objects/Node.hpp"
-#include "../math/Vector.hpp"
+#include "math/Vector.hpp"
 #include "utilities/Utils.hpp"
 #include <controllers/BaseController.hpp>
 
@@ -48,6 +48,6 @@ public:
 
     void update(double delta_t) override;
 
-    const Transform& get_view_matrix() const { return get_transform(); }
+    Transform get_view_matrix() const;
     const Transform& get_projection_matrix() const { return projection; }
 };

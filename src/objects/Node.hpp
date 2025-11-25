@@ -87,12 +87,7 @@ public:
     }
 
     void set_rotation_rad(Vector3 rot_rad) {
-        // rotation_rad = {
-        //     Utils::wrap_radians(rot_rad.x),
-        //     Utils::wrap_radians(rot_rad.y),
-        //     Utils::wrap_radians(rot_rad.z)
-        // };
-        rotation = Quaternion(rot_rad);
+        rotation = Quaternion::from_euler(rot_rad).normalized();
         set_dirty_flag();
     }
 
@@ -113,11 +108,14 @@ public:
     }
 
     void rotate_rad(const Vector3& rot_rad) {
-        Vector3 rotation_rad = rotation.to_euler();
-        rotation_rad.x = Utils::wrap_radians(rotation_rad.x + rot_rad.x);
-        rotation_rad.y = Utils::wrap_radians(rotation_rad.y + rot_rad.y);
-        rotation_rad.z = Utils::wrap_radians(rotation_rad.z + rot_rad.z);
-        rotation = Quaternion(rotation_rad);
+        Quaternion delta = Quaternion::from_euler(rot_rad);
+
+        // local space
+        // rotation = rotation * delta;
+        // world space
+        // rotation = delta * rotation;
+
+        rotation = (delta * rotation).normalized();
         set_dirty_flag();
     }
 

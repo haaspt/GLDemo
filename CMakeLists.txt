@@ -113,6 +113,7 @@ add_executable(GLDemo
         src/math/Transform.hpp
         src/math/Quaternion.cpp
         src/math/Quaternion.hpp
+        src/math/Utils.hpp
 )
 
 target_include_directories(GLDemo PRIVATE ${CMAKE_SOURCE_DIR}/src)
@@ -135,25 +136,40 @@ endif ()
 # --- Tests ---
 enable_testing()
 
-add_executable(tests
-        tests/test_vector.cpp
-        tests/test_transform.cpp
-        src/math/Vector.hpp
-        src/utilities/Utils.hpp
+# Pick up all test sources automatically
+file(GLOB TEST_SOURCES CONFIGURE_DEPENDS tests/*.cpp)
+
+# Add ONLY the implementation files that your tests call into.
+# (This solves the "undefined symbols" without touching GLDemo.)
+set(TEST_IMPL_SOURCES
+        src/math/Transform.cpp
+        src/math/Quaternion.cpp
+        tests/test_quaternion.cpp
+        # add other .cpp files here if future tests need them
 )
 
+add_executable(tests
+        ${TEST_SOURCES}
+        ${TEST_IMPL_SOURCES}
+)
+
+# So tests can include project headers like "math/Transform.hpp"
 target_include_directories(tests PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
+# Link GoogleTest and whatever libraries your code under test needs
 target_link_libraries(tests PRIVATE
-        GTest::gtest GTest::gtest_main GTest::gmock
         glm::glm
+        assimp::assimp
+        GTest::gtest_main        # supplies main(); don't also write your own
+        GTest::gmock             # optional—remove if you don't use mocks
 )
 
-# Either simple CTest entry:
-add_test(NAME VectorTests COMMAND tests)
-# Or nicer automatic discovery (requires CMake ≥3.10):
+# Let CTest/CLion discover individual TEST() cases
 include(GoogleTest)
 gtest_discover_tests(tests)
+
+# (Nice to have warnings)
+target_compile_options(tests PRIVATE -Wall -Wextra -Wpedantic)
 
 # --- Runtime assets ---
 set(SHADER_DIR ${CMAKE_SOURCE_DIR}/src/game/shaders)

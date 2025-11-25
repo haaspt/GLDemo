@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 #include "../src/math/Vector.hpp"
+#include "../src/math/Transform.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <cmath>
 
-const double EPSILON = 1e-6;
+constexpr double EPSILON = 1e-6;
 
 // Helper function to compare two matrices
 bool matricesEqual(const glm::mat4& a, const glm::mat4& b, double epsilon = EPSILON) {

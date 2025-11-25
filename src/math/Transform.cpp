@@ -6,35 +6,33 @@
 #include "math/Quaternion.hpp"
 
 Transform::Transform(const Quaternion& quat)  : data{0} {
-    double xx = quat.x * quat.x;
-    double yy = quat.y * quat.y;
-    double zz = quat.z * quat.z;
-    double xy = quat.x * quat.y;
-    double xz = quat.x * quat.z;
-    double yz = quat.y * quat.z;
-    double wx = quat.w * quat.x;
-    double wy = quat.w * quat.y;
-    double wz = quat.w * quat.z;
+    double d = quat.length_squared();
+    double s = 2.0 / d;
 
-    data[0]  = 1 - 2*(yy + zz);
-    data[1]  = 2*(xy - wz);
-    data[2]  = 2*(xz + wy);
-    data[3]  = 0;
+    double xs = quat.x * s, ys = quat.y * s, zs = quat.z * s;
+    double wx = quat.w * xs, wy = quat.w * ys, wz = quat.w * zs;
+    double xx = quat.x * xs, xy = quat.x * ys, xz = quat.x * zs;
+    double yy = quat.y * ys, yz = quat.y * zs, zz = quat.z * zs;
 
-    data[4]  = 2*(xy + wz);
-    data[5]  = 1 - 2*(xx + zz);
-    data[6]  = 2*(yz - wx);
-    data[7]  = 0;
+    data[0]  = 1.0 - (yy + zz);
+    data[1]  =        xy - wz;
+    data[2]  =        xz + wy;
+    data[3]  = 0.0;
 
-    data[8]  = 2*(xz - wy);
-    data[9]  = 2*(yz + wx);
-    data[10] = 1 - 2*(xx + yy);
-    data[11] = 0;
+    data[4]  =        xy + wz;
+    data[5]  = 1.0 - (xx + zz);
+    data[6]  =        yz - wx;
+    data[7]  = 0.0;
 
-    data[12] = 0;
-    data[13] = 0;
-    data[14] = 0;
-    data[15] = 1;
+    data[8]  =        xz - wy;
+    data[9]  =        yz + wx;
+    data[10] = 1.0 - (xx + yy);
+    data[11] = 0.0;
+
+    data[12] = 0.0;
+    data[13] = 0.0;
+    data[14] = 0.0;
+    data[15] = 1.0;
 }
 
 

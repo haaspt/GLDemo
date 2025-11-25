@@ -57,7 +57,7 @@ int main(int /*argc*/, char** argv) {
     Input::initialize(window);
 
     auto suzanne = GameObject("suzanne.gltf", "default");
-    suzanne.rotate_deg(0, 0, 0);
+    suzanne.rotate_deg(0, 180, 0);
 
     Camera camera(
                 65.0,
@@ -70,7 +70,7 @@ int main(int /*argc*/, char** argv) {
 
 
     auto light_source = LightSource("sphere.gltf", Vector3{1.0}, 0.4);
-    light_source.set_position(-1.75, 0, 2.75);
+    light_source.set_position(-1.75, 0, -2.75);
     light_source.set_scale(0.5, 0.5, 0.5);
 
 
