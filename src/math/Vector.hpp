@@ -230,6 +230,11 @@ struct Vector3 {
 
     const Vector3& normalize() {
         double mag = magnitude();
+
+        if (mag == 0.0) {
+            x = y = z = 0;
+            return *this;
+        }
         x /= mag;
         y /= mag;
         z /= mag;
