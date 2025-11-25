@@ -74,7 +74,7 @@ namespace Utils {
     };
 
     template<typename T>
-    [[nodiscard]] int sign(T value) {
+    [[nodiscard]] constexpr int sign(T value) {
         if (value > T(0)) return 1;
         if (value < T(0)) return -1;
         return 0;
@@ -98,15 +98,15 @@ namespace Utils {
         return dir / filename;
     }
 
-    [[nodiscard]] inline double to_degrees(double rad) {
+    [[nodiscard]] constexpr double to_degrees(double rad) {
         return rad * RAD_TO_DEG;
     }
 
-    [[nodiscard]] inline double to_radians(double deg) {
+    [[nodiscard]] constexpr double to_radians(double deg) {
         return deg * DEG_TO_RAD;
     }
 
-    [[nodiscard]] inline double wrap_radians(double rad) {
+    [[nodiscard]] constexpr double wrap_radians(double rad) {
         double wrapped = std::fmod(rad, PI * 2);
         return wrapped < 0.0 ? wrapped + (PI * 2) : wrapped;
     }
