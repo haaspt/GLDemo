@@ -5,7 +5,7 @@
 #pragma once
 
 #include "objects/Node.hpp"
-#include "utilities/Vector.hpp"
+#include "../math/Vector.hpp"
 #include "utilities/Utils.hpp"
 #include <controllers/BaseController.hpp>
 

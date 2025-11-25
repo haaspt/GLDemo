@@ -6,7 +6,7 @@
 
 #include "objects/Node.hpp"
 #include "utilities/Input.hpp"
-#include "utilities/Vector.hpp"
+#include "../math/Vector.hpp"
 
 void FPSController::update(Node &node, double delta_t) {
     Vector2 cursor_move_vec = Input::get_cursor_vec();

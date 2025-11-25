@@ -9,7 +9,7 @@
 #include "objects/GameObject.hpp"
 #include "objects/LightSource.hpp"
 #include "utilities/Input.hpp"
-#include "utilities/Vector.hpp"
+#include "math/Vector.hpp"
 #include "resources/ResourceManager.hpp"
 #include "controllers/FPSController.hpp"
 

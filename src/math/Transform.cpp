@@ -1,12 +1,42 @@
-#include "utilities/Vector.hpp"
+//
+// Created by Patrick Haas on 11/24/25.
+//
 
-inline Vector3 Vector3::cross(const Vector3& other) const {
-    return Vector3(
-        y * other.z - z * other.y,
-        z * other.x - x * other.z,
-        x * other.y - y * other.x
-    );
+#include "Transform.hpp"
+#include "math/Quaternion.hpp"
+
+Transform::Transform(const Quaternion& quat)  : data{0} {
+    double xx = quat.x * quat.x;
+    double yy = quat.y * quat.y;
+    double zz = quat.z * quat.z;
+    double xy = quat.x * quat.y;
+    double xz = quat.x * quat.z;
+    double yz = quat.y * quat.z;
+    double wx = quat.w * quat.x;
+    double wy = quat.w * quat.y;
+    double wz = quat.w * quat.z;
+
+    data[0]  = 1 - 2*(yy + zz);
+    data[1]  = 2*(xy - wz);
+    data[2]  = 2*(xz + wy);
+    data[3]  = 0;
+
+    data[4]  = 2*(xy + wz);
+    data[5]  = 1 - 2*(xx + zz);
+    data[6]  = 2*(yz - wx);
+    data[7]  = 0;
+
+    data[8]  = 2*(xz - wy);
+    data[9]  = 2*(yz + wx);
+    data[10] = 1 - 2*(xx + yy);
+    data[11] = 0;
+
+    data[12] = 0;
+    data[13] = 0;
+    data[14] = 0;
+    data[15] = 1;
 }
+
 
 Transform operator*(const Transform& lhs, const Transform& rhs) {
     Transform out;

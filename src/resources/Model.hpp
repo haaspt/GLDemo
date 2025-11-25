@@ -12,7 +12,9 @@
 #include "assimp/material.h"
 #include "resources/Shader.hpp"
 #include "resources/Texture.hpp"
-#include "utilities/Vector.hpp"
+#include "math/Vector.hpp"
+#include "math/Transform.hpp"
+
 
 namespace Model {
     class Material {

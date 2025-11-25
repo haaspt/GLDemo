@@ -92,8 +92,7 @@ add_executable(GLDemo
         src/utilities/Input.cpp
         src/utilities/Input.hpp
         src/utilities/Utils.hpp
-        src/utilities/Vector.cpp
-        src/utilities/Vector.hpp
+        src/math/Vector.hpp
         src/resources/ResourceManager.cpp
         src/resources/ResourceManager.hpp
         src/objects/Node.cpp
@@ -110,6 +109,10 @@ add_executable(GLDemo
         src/objects/Camera.hpp
         src/controllers/FPSController.cpp
         src/controllers/FPSController.hpp
+        src/math/Transform.cpp
+        src/math/Transform.hpp
+        src/math/Quaternion.cpp
+        src/math/Quaternion.hpp
 )
 
 target_include_directories(GLDemo PRIVATE ${CMAKE_SOURCE_DIR}/src)
@@ -135,8 +138,7 @@ enable_testing()
 add_executable(tests
         tests/test_vector.cpp
         tests/test_transform.cpp
-        src/utilities/Vector.cpp
-        src/utilities/Vector.hpp
+        src/math/Vector.hpp
         src/utilities/Utils.hpp
 )
 

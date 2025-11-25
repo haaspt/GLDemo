@@ -1,6 +1,8 @@
 #pragma once
 
-#include "utilities/Vector.hpp"
+#include "math/Vector.hpp"
+#include "math/Transform.hpp"
+#include "math/Quaternion.hpp"
 #include "utilities/Utils.hpp"
 
 class Node {
@@ -16,7 +18,7 @@ protected:
     Vector3 velocity = Vector3(0.0);
     Vector3 position = Vector3(0.0);
     Vector3 scale = Vector3(1.0);
-    Vector3 rotation_rad = Vector3(0.0);
+    Quaternion rotation = Quaternion();
 
     void set_dirty_flag() const { is_transform_dirty = true; }
 
@@ -80,16 +82,17 @@ public:
         set_scale({x, y, z});
     }
 
-    Vector3 get_rotation_rad() const {
-        return rotation_rad;
+    Vector3 get_rotation_rad() {
+        return rotation.to_euler();
     }
 
     void set_rotation_rad(Vector3 rot_rad) {
-        rotation_rad = {
-            Utils::wrap_radians(rot_rad.x),
-            Utils::wrap_radians(rot_rad.y),
-            Utils::wrap_radians(rot_rad.z)
-        };
+        // rotation_rad = {
+        //     Utils::wrap_radians(rot_rad.x),
+        //     Utils::wrap_radians(rot_rad.y),
+        //     Utils::wrap_radians(rot_rad.z)
+        // };
+        rotation = Quaternion(rot_rad);
         set_dirty_flag();
     }
 
@@ -97,8 +100,8 @@ public:
         set_rotation_rad({x_rad, y_rad, z_rad});
     }
 
-    Vector3 get_rotation_deg() const {
-        return rotation_rad.to_degrees();
+    Vector3 get_rotation_deg() {
+        return get_rotation_rad().to_degrees();
     }
 
     void set_rotation_deg(Vector3 rot_deg) {
@@ -110,9 +113,11 @@ public:
     }
 
     void rotate_rad(const Vector3& rot_rad) {
+        Vector3 rotation_rad = rotation.to_euler();
         rotation_rad.x = Utils::wrap_radians(rotation_rad.x + rot_rad.x);
         rotation_rad.y = Utils::wrap_radians(rotation_rad.y + rot_rad.y);
         rotation_rad.z = Utils::wrap_radians(rotation_rad.z + rot_rad.z);
+        rotation = Quaternion(rotation_rad);
         set_dirty_flag();
     }
 

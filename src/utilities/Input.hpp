@@ -6,7 +6,7 @@
 
 #include <GLFW/glfw3.h>
 
-#include "utilities/Vector.hpp"
+#include "../math/Vector.hpp"
 
 
 class Input {
