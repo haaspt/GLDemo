@@ -144,7 +144,7 @@ file(GLOB TEST_SOURCES CONFIGURE_DEPENDS tests/*.cpp)
 set(TEST_IMPL_SOURCES
         src/math/Transform.cpp
         src/math/Quaternion.cpp
-        tests/test_quaternion.cpp
+        src/objects/Node.cpp
         # add other .cpp files here if future tests need them
 )
 
