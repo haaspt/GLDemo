@@ -15,8 +15,8 @@
 #include "controllers/FPSController.hpp"
 
 
-constexpr unsigned int W_WIDTH = 800;
-constexpr unsigned int W_HEIGHT = 600;
+constexpr unsigned int W_WIDTH = 1200;
+constexpr unsigned int W_HEIGHT = 900;
 
 constexpr double TARGET_FPS = 120;
 constexpr double FRAME_DURATION_MS = 1.0 / TARGET_FPS * 1000.0;
@@ -68,7 +68,7 @@ int main(int /*argc*/, char** argv) {
                 0.1,
                 500.0,
                 {0, 0, -6.0},
-                std::make_unique<FPSController>(5.0, 0.2)
+                std::make_unique<FPSController>(3.0, 0.15)
                 );
 
 
