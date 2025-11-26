@@ -11,6 +11,7 @@
 #include "utilities/Input.hpp"
 #include "math/Vector.hpp"
 #include "resources/ResourceManager.hpp"
+#include "resources/Skybox.hpp"
 #include "controllers/FPSController.hpp"
 
 
@@ -52,6 +53,8 @@ int main(int /*argc*/, char** argv) {
     // Window setup
     GLFWwindow* window = initWindow();
 
+    auto exe_dir_path = Utils::exe_dir_path_from_argv0(argv[0]);
+
     // Singleton setup
     Managers::initialize(Utils::exe_dir_path_from_argv0(argv[0]));
     Input::initialize(window);
@@ -72,6 +75,17 @@ int main(int /*argc*/, char** argv) {
     auto light_source = LightSource("sphere.gltf", Vector3{1.0}, 0.4);
     light_source.set_position(-1.75, 0, -2.75);
     light_source.set_scale(0.5, 0.5, 0.5);
+
+    // Skybox
+    std::vector<std::string> skybox_textures = {
+        exe_dir_path / "textures/skybox/px.png",
+        exe_dir_path / "textures/skybox/nx.png",
+        exe_dir_path / "textures/skybox/py.png",
+        exe_dir_path / "textures/skybox/ny.png",
+        exe_dir_path / "textures/skybox/pz.png",
+        exe_dir_path / "textures/skybox/nz.png",
+    };
+    Skybox skybox = Skybox(skybox_textures);
 
 
     double delta_t = 0.0;
@@ -95,6 +109,9 @@ int main(int /*argc*/, char** argv) {
 
         // Render Loop
         camera.update(delta_t);
+
+        skybox.render(camera);
+
         light_source.update(delta_t);
         light_source.render(camera, {});
 

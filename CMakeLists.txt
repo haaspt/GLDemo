@@ -114,6 +114,8 @@ add_executable(GLDemo
         src/math/Quaternion.cpp
         src/math/Quaternion.hpp
         src/math/Utils.hpp
+        src/resources/Skybox.cpp
+        src/resources/Skybox.hpp
 )
 
 target_include_directories(GLDemo PRIVATE ${CMAKE_SOURCE_DIR}/src)
