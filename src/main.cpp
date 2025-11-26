@@ -77,6 +77,14 @@ int main(int /*argc*/, char** argv) {
     light_source.set_scale(0.5, 0.5, 0.5);
 
     // Skybox
+    // std::vector<std::string> skybox_textures = {
+    //     exe_dir_path / "textures/skybox/right.png",
+    //     exe_dir_path / "textures/skybox/left.png",
+    //     exe_dir_path / "textures/skybox/top.png",
+    //     exe_dir_path / "textures/skybox/bottom.png",
+    //     exe_dir_path / "textures/skybox/front.png",
+    //     exe_dir_path / "textures/skybox/back.png",
+    // };
     std::vector<std::string> skybox_textures = {
         exe_dir_path / "textures/skybox/px.png",
         exe_dir_path / "textures/skybox/nx.png",

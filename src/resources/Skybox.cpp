@@ -39,6 +39,8 @@ unsigned int Skybox::load_cubemap(const std::vector<std::string>& faces) {
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 
+    stbi_set_flip_vertically_on_load(false);
+
     int width, height, nrChannels;
     for (unsigned int i = 0; i < faces.size(); i++) {
         unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 3);
@@ -52,6 +54,9 @@ unsigned int Skybox::load_cubemap(const std::vector<std::string>& faces) {
             stbi_image_free(data);
         }
     }
+
+    stbi_set_flip_vertically_on_load(true);
+
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
