@@ -24,6 +24,7 @@ public:
               far_plane_dist
           )),
           controller(std::move(controller)) {
+        properties = properties | SceneProperties::CAMERA;
         position = pos;
     }
 

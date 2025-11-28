@@ -18,6 +18,7 @@ public:
         : RenderedObject(model_name, "light_source", std::move(controller)),
           color(color),
           ambient_strength(ambient_strength) {
+        properties = properties | SceneProperties::AREA_LIGHT | SceneProperties::RENDERABLE;
     };
 
     Vector3 get_color() const { return color; }
@@ -26,5 +27,5 @@ public:
     float get_strength() const { return ambient_strength; }
     void set_strength(float new_strength) { ambient_strength = new_strength; }
 
-    void render(const Camera& camera, const std::vector<LightSource*>&) const override;
+    void render(const Camera* camera, const std::vector<const LightSource*>&) const override;
 };

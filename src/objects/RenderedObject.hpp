@@ -28,6 +28,7 @@ public:
     RenderedObject(const std::string& model_name, const std::string& shader_name,
                    std::unique_ptr<BaseController> controller = {})
         : controller(std::move(controller)), model_name(model_name), shader_name(shader_name) {
+        properties = properties | SceneProperties::RENDERABLE;
         model = Managers::model_manager().get(model_name);
         shader = Managers::shader_manager().get(shader_name);
     };
@@ -87,5 +88,5 @@ public:
 
     void set_controller(std::unique_ptr<BaseController> new_controller) { controller = std::move(new_controller); }
 
-    virtual void render(const Camera& camera, const std::vector<LightSource*>& lights) const = 0;
+    virtual void render(const Camera* camera, const std::vector<const LightSource*>& lights) const = 0;
 };

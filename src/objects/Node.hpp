@@ -6,6 +6,14 @@
 #include "utilities/Utils.hpp"
 
 class Node {
+public:
+    enum class SceneProperties : unsigned int {
+        NONE = 0,
+        RENDERABLE = 1 << 0,
+        CAMERA = 1 << 1,
+        AREA_LIGHT = 1 << 2,
+    };
+
 private:
     unsigned int id;
 
@@ -15,6 +23,7 @@ private:
     void update_transform() const;
 
 protected:
+    SceneProperties properties;
     Vector3 velocity = Vector3(0.0);
     Vector3 position = Vector3(0.0);
     Vector3 scale = Vector3(1.0);
@@ -26,7 +35,7 @@ protected:
     }
 
 public:
-    Node() : id(Utils::IdGen::get_id()) {
+    Node() : id(Utils::IdGen::get_id()), properties(SceneProperties::NONE) {
     }
 
     virtual ~Node() noexcept = default;
@@ -40,6 +49,7 @@ public:
     Node& operator=(Node&&) noexcept = default;
 
     unsigned int get_id() const { return id; }
+    SceneProperties get_properties() const { return properties; }
 
     virtual void update(double delta_t);
 
@@ -133,3 +143,11 @@ public:
 
     const Transform& get_transform() const;
 };
+
+constexpr Node::SceneProperties operator|(Node::SceneProperties a, Node::SceneProperties b) {
+    return static_cast<Node::SceneProperties>(static_cast<unsigned int>(a) | static_cast<unsigned int>(b));
+}
+
+constexpr Node::SceneProperties operator&(Node::SceneProperties a, Node::SceneProperties b) {
+    return static_cast<Node::SceneProperties>(static_cast<unsigned int>(a) & static_cast<unsigned int>(b));
+}

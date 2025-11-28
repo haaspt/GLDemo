@@ -9,7 +9,7 @@ public:
         : RenderedObject(model_name, shader_name, std::move(controller)) {
     }
 
-    void render(const Camera& camera, const std::vector<LightSource*>& lights) const override;
+    void render(const Camera* camera, const std::vector<const LightSource*>& lights) const override;
 
     void process(double delta_t) override;
 };
