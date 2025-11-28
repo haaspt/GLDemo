@@ -13,6 +13,7 @@
 #include "resources/ResourceManager.hpp"
 #include "resources/Skybox.hpp"
 #include "controllers/FPSController.hpp"
+#include "scene/Scene.hpp"
 
 
 constexpr unsigned int W_WIDTH = 1200;
@@ -59,22 +60,24 @@ int main(int /*argc*/, char** argv) {
     Managers::initialize(Utils::exe_dir_path_from_argv0(argv[0]));
     Input::initialize(window);
 
-    auto suzanne = GameObject("suzanne.gltf", "default");
-    suzanne.rotate_deg(0, 180, 0);
+    Scene::Scene main_scene = Scene::Scene();
 
-    Camera camera(
-                65.0,
-                static_cast<double>(W_WIDTH) / W_HEIGHT,
-                0.1,
-                500.0,
-                {0, 0, -6.0},
-                std::make_unique<FPSController>(3.0, 0.15)
-                );
+    auto suzanne = main_scene.create_object<GameObject>("suzanne.gltf", "default");
+    suzanne->rotate_deg(0, 180, 0);
 
+    auto camera = main_scene.create_object<Camera>(
+        65.0,
+        static_cast<double>(W_WIDTH) / W_HEIGHT,
+        0.1,
+        500.0,
+        Vector3(0, 0, -6.0),
+        std::make_unique<FPSController>(3.0, 0.15)
+    );
 
-    auto light_source = LightSource("sphere.gltf", Vector3{1.0}, 0.4);
-    light_source.set_position(-1.75, 0, -2.75);
-    light_source.set_scale(0.5, 0.5, 0.5);
+    auto light_source = main_scene.create_object<LightSource>("sphere.gltf", Vector3{1.0}, 0.4);
+    light_source->set_position(-1.75, 0, -2.75);
+    light_source->set_scale(0.5, 0.5, 0.5);
+
 
     // Skybox
     // std::vector<std::string> skybox_textures = {
@@ -93,7 +96,7 @@ int main(int /*argc*/, char** argv) {
         exe_dir_path / "textures/skybox/pz.png",
         exe_dir_path / "textures/skybox/nz.png",
     };
-    Skybox skybox = Skybox(skybox_textures);
+    main_scene.create_skybox(skybox_textures);
 
 
     double delta_t = 0.0;
@@ -114,18 +117,8 @@ int main(int /*argc*/, char** argv) {
 
         Input::poll();
 
-
-        // Render Loop
-        camera.update(delta_t);
-
-        skybox.render(camera);
-
-        light_source.update(delta_t);
-        light_source.render(camera, {});
-
-
-        suzanne.update(delta_t);
-        suzanne.render(camera, {&light_source});
+        main_scene.update(delta_t);
+        main_scene.render();
 
         glfwSwapBuffers(window);
 

@@ -116,6 +116,7 @@ add_executable(GLDemo
         src/math/Utils.hpp
         src/resources/Skybox.cpp
         src/resources/Skybox.hpp
+        src/scene/Scene.hpp
 )
 
 target_include_directories(GLDemo PRIVATE ${CMAKE_SOURCE_DIR}/src)
