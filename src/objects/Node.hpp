@@ -1,11 +1,19 @@
 #pragma once
 
+#include <unordered_set>
+
 #include "math/Vector.hpp"
 #include "math/Transform.hpp"
 #include "math/Quaternion.hpp"
 #include "utilities/Utils.hpp"
 
+namespace Scene {
+    class Scene;
+}
+
 class Node {
+    using NodeId = unsigned int;
+
 public:
     enum class SceneProperties : unsigned int {
         NONE = 0,
@@ -15,21 +23,33 @@ public:
     };
 
 private:
-    unsigned int id;
+    friend class Scene::Scene;
+
+    NodeId id;
 
     mutable Transform transform = Transform(1.0);
     mutable bool is_transform_dirty = false;
 
+    bool should_be_deleted = false;
+
+    void mark_children_for_deletion() const;
+
     void update_transform() const;
 
 protected:
+    NodeId parent_id = 0;
+    Scene::Scene* scene = nullptr;
+    std::unordered_set<NodeId> children_;
+
     SceneProperties properties;
     Vector3 velocity = Vector3(0.0);
     Vector3 position = Vector3(0.0);
     Vector3 scale = Vector3(1.0);
     Quaternion rotation = Quaternion();
 
-    void set_dirty_flag() const { is_transform_dirty = true; }
+    void set_dirty_flag() const;
+
+    void set_for_deletion();
 
     virtual void process(double const/*delta_t*/) {
     }
@@ -38,7 +58,7 @@ public:
     Node() : id(Utils::IdGen::get_id()), properties(SceneProperties::NONE) {
     }
 
-    virtual ~Node() noexcept = default;
+    virtual ~Node() noexcept { children_.clear(); }
 
     Node(const Node&) = delete;
 
@@ -47,6 +67,18 @@ public:
     Node(Node&&) noexcept = default;
 
     Node& operator=(Node&&) noexcept = default;
+
+    NodeId add_child(NodeId child_id);
+
+    bool remove_child(NodeId child_id);
+
+    bool detach_child(NodeId child_id);
+
+    const std::unordered_set<NodeId>& get_children() const {
+        return children_;
+    }
+
+    bool detatch_from_parent() const;
 
     unsigned int get_id() const { return id; }
     SceneProperties get_properties() const { return properties; }
@@ -92,7 +124,7 @@ public:
         set_scale({x, y, z});
     }
 
-    Vector3 get_rotation_rad() {
+    Vector3 get_rotation_rad() const {
         return rotation.to_euler();
     }
 
@@ -105,7 +137,7 @@ public:
         set_rotation_rad({x_rad, y_rad, z_rad});
     }
 
-    Vector3 get_rotation_deg() {
+    Vector3 get_rotation_deg() const {
         return get_rotation_rad().to_degrees();
     }
 
@@ -142,6 +174,8 @@ public:
     }
 
     const Transform& get_transform() const;
+
+    const Transform& get_clean_transform() const;
 };
 
 constexpr Node::SceneProperties operator|(Node::SceneProperties a, Node::SceneProperties b) {

@@ -16,9 +16,10 @@
 
 namespace Scene {
     using NodeId = unsigned int;
+
     class Scene {
     private:
-        std::unordered_map<NodeId, std::unique_ptr<Node>> scene_objects_;
+        std::unordered_map<NodeId, std::unique_ptr<Node> > scene_objects_;
         std::unordered_set<NodeId> area_lights_;
         NodeId scene_camera_;
         std::unique_ptr<Skybox> skybox_ = nullptr;
@@ -31,19 +32,18 @@ namespace Scene {
         }
 
         template<typename T, typename... Args>
-        T* create_object(Args&&... args) {
+        NodeId create_object(Args&&... args) {
             auto obj = std::make_unique<T>(std::forward<Args>(args)...);
-            T* ptr = obj.get();
-            add_scene_object(std::move(obj));
-            return ptr;
+            return add_scene_object(std::move(obj));
         }
 
         void create_skybox(const std::vector<std::string>& skybox_textures) {
             skybox_ = std::make_unique<Skybox>(skybox_textures);
         }
 
-        NodeId add_scene_object(std::unique_ptr<Node> node) {
+        NodeId add_scene_object(std::unique_ptr<Node> node, NodeId parent_node_id = 0) {
             NodeId id = node->get_id();
+            node->scene = this;
             if (node_has_property(*node, Node::SceneProperties::AREA_LIGHT)) {
                 area_lights_.insert(id);
             }
@@ -51,6 +51,14 @@ namespace Scene {
                 scene_camera_ = id;
             }
             scene_objects_[id] = std::move(node);
+            if (parent_node_id) {
+                // Ensure parent_id exists
+                const auto& it = scene_objects_.find(parent_node_id);
+                assert(it != scene_objects_.end());
+                auto parent = it->second.get();
+                parent->children_.insert(id);
+                scene_objects_[id]->parent_id = parent_node_id;
+            }
             return id;
         }
 
@@ -63,7 +71,7 @@ namespace Scene {
         }
 
         void update(double delta_t) const {
-            for (const auto& [key, object] : scene_objects_) {
+            for (const auto& [key, object]: scene_objects_) {
                 // TODO check objects for `should_be_removed` flag
                 object->update(delta_t);
             }
@@ -79,14 +87,14 @@ namespace Scene {
             }
 
             std::vector<const LightSource*> lights;
-            for (auto light_id : area_lights_) {
+            for (auto light_id: area_lights_) {
                 auto it = scene_objects_.find(light_id);
                 if (it != scene_objects_.end()) {
                     lights.push_back(dynamic_cast<LightSource*>(it->second.get()));
                 }
             }
 
-            for (const auto& [key, object] : scene_objects_) {
+            for (const auto& [key, object]: scene_objects_) {
                 if (node_has_property(*object, Node::SceneProperties::RENDERABLE)) {
                     auto* rendered = dynamic_cast<RenderedObject*>(object.get());
                     rendered->render(camera, lights);

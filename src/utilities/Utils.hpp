@@ -18,7 +18,7 @@ namespace Utils {
 
     class IdGen {
     private:
-        inline static unsigned int current_id = 0;
+        inline static unsigned int current_id = 1;  // Start at 1 so 0 can act as a null value;
 
     public:
         static unsigned int get_id() { return current_id++; }
