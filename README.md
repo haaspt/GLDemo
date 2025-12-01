@@ -16,8 +16,8 @@ In addition, I've taken a good deal of inspiration from the [Godot](https://godo
   - [ ] Environmental attributes (fog, etc.)
 
 - Objects
-  - [ ] Scene object
-  - [ ] Hierarchical scene/node graph
+  - [x] Scene object
+  - [x] Hierarchical scene/node graph
   - [ ] Frustrum culling (using spherical or AABB volumes)
   - [ ] Basic scene serialization
 
