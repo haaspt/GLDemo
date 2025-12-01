@@ -83,9 +83,9 @@ public:
         return children_;
     }
 
-    bool detatch_from_parent() const;
+    bool detach_from_parent() const;
 
-    unsigned int get_id() const { return id; }
+    NodeId get_id() const { return id; }
     SceneProperties get_properties() const { return properties; }
 
     virtual void update(double delta_t);

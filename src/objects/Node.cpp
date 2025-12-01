@@ -27,6 +27,7 @@ void Node::set_for_deletion() {
 
 Node::NodeId Node::add_child(NodeId child_id) {
     assert(scene);
+    assert(child_id != id);
     children_.insert(child_id);
     const auto& child = scene->get_scene_object(child_id);
     assert(!child->parent_id);
@@ -45,7 +46,7 @@ bool Node::detach_child(NodeId child_id) {
     return children_.erase(child_id);
 }
 
-bool Node::detatch_from_parent() const {
+bool Node::detach_from_parent() const {
     if (!parent_id) {
         return false;
     }

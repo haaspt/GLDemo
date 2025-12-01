@@ -43,6 +43,7 @@ namespace Scene {
 
         NodeId add_scene_object(std::unique_ptr<Node> node, NodeId parent_node_id = 0) {
             NodeId id = node->get_id();
+            assert(parent_node_id != id);
             node->scene = this;
             if (node_has_property(*node, Node::SceneProperties::AREA_LIGHT)) {
                 area_lights_.insert(id);
