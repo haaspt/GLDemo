@@ -28,9 +28,9 @@ std::string load_shader_source_from_file(const std::string& shader_path) {
     return shader_code;
 }
 
-Shader::Shader(const std::string& vertex_shader_path, const std::string& fragemnt_shader_path) {
+Shader::Shader(const std::string& vertex_shader_path, const std::string& fragment_shader_path) {
     const std::string v_shader_source = load_shader_source_from_file(vertex_shader_path);
-    const std::string f_shader_source = load_shader_source_from_file(fragemnt_shader_path);
+    const std::string f_shader_source = load_shader_source_from_file(fragment_shader_path);
 
     unsigned int v_shader, f_shader;
     int success;
@@ -110,40 +110,49 @@ void Shader::use() const {
     glUseProgram(id);
 }
 
-void Shader::set_bool(const std::string& param_name, bool value) const {
+void Shader::set_bool(const std::string& uniform_name, bool value) const {
     glUniform1i(
-        glGetUniformLocation(id, param_name.c_str()),
+        get_uniform_location(uniform_name),
         (int) value
     );
 }
 
-void Shader::set_int(const std::string& param_name, int value) const {
+void Shader::set_int(const std::string& uniform_name, int value) const {
     glUniform1i(
-        glGetUniformLocation(id, param_name.c_str()),
+        get_uniform_location(uniform_name),
         value
     );
 }
 
-void Shader::set_float(const std::string& param_name, float value) const {
+void Shader::set_float(const std::string& uniform_name, float value) const {
     glUniform1f(
-        glGetUniformLocation(id, param_name.c_str()),
+        get_uniform_location(uniform_name),
         value
     );
 }
 
-void Shader::set_vec3(const std::string& param_name, const glm::vec3& value) const {
+void Shader::set_vec3(const std::string& uniform_name, const glm::vec3& value) const {
     glUniform3fv(
-        glGetUniformLocation(id, param_name.c_str()),
+        get_uniform_location(uniform_name),
         1,
         glm::value_ptr(value)
     );
 }
 
-void Shader::set_mat4(const std::string& param_name, const glm::mat4& value) const {
+void Shader::set_mat4(const std::string& uniform_name, const glm::mat4& value) const {
     glUniformMatrix4fv(
-        glGetUniformLocation(id, param_name.c_str()),
+        get_uniform_location(uniform_name),
         1,
         GL_FALSE,
         glm::value_ptr(value)
     );
+}
+
+GLuint Shader::get_uniform_location(const std::string& uniform_name) const {
+    if (uniform_id_lookup_.find(uniform_name) != uniform_id_lookup_.end()) {
+        return uniform_id_lookup_[uniform_name];
+    }
+    GLuint loc = glGetUniformLocation(id, uniform_name.c_str());
+    uniform_id_lookup_[uniform_name] = loc;
+    return loc;
 }
