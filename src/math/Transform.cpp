@@ -136,6 +136,75 @@ Transform& Transform::rotate(double radians, const Vector3& axis) {
     return *this;
 }
 
+Vector3 Transform::get_translation() const {
+    return {at(0, 3), at(1, 3), at(2, 3)};
+}
+
+Vector3 Transform::get_scale() const {
+    double scale_x = Vector3(data[0], data[4], data[8]).magnitude();
+    double scale_y = Vector3(data[1], data[5], data[9]).magnitude();
+    double scale_z = Vector3(data[2], data[6], data[10]).magnitude();
+    return {scale_x, scale_y, scale_z};
+}
+
+Quaternion Transform::get_rotation() const {
+    Vector3 s = get_scale();
+
+    // Guard for div-by-zero
+    double inv_sx = (s.x != 0.0) ? 1.0 / s.x : 0.0;
+    double inv_sy = (s.y != 0.0) ? 1.0 / s.y : 0.0;
+    double inv_sz = (s.z != 0.0) ? 1.0 / s.z : 0.0;
+
+    double m00 = data[0]  * inv_sx;
+    double m01 = data[1]  * inv_sy;
+    double m02 = data[2]  * inv_sz;
+
+    double m10 = data[4]  * inv_sx;
+    double m11 = data[5]  * inv_sy;
+    double m12 = data[6]  * inv_sz;
+
+    double m20 = data[8]  * inv_sx;
+    double m21 = data[9]  * inv_sy;
+    double m22 = data[10] * inv_sz;
+
+    Quaternion q;
+    double trace = m00 + m11 + m22;
+
+    if (trace > 0.0) {
+        double t = std::sqrt(trace + 1.0);
+        q.w = 0.5 * t;
+        double inv_t = 0.5 / t;
+        q.x = (m21 - m12) * inv_t;
+        q.y = (m02 - m20) * inv_t;
+        q.z = (m10 - m01) * inv_t;
+    } else if (m00 >= m11 && m00 >= m22) {
+        double t = std::sqrt(1.0 + m00 - m11 - m22);
+        double inv_t = 0.5 / t;
+        q.x = 0.5 * t;
+        q.y = (m01 + m10) * inv_t;
+        q.z = (m02 + m20) * inv_t;
+        q.w = (m21 - m12) * inv_t;
+    } else if (m11 > m22) {
+        double t = std::sqrt(1.0 + m11 - m00 - m22);
+        double inv_t = 0.5 / t;
+        q.x = (m01 + m10) * inv_t;
+        q.y = 0.5 * t;
+        q.z = (m12 + m21) * inv_t;
+        q.w = (m02 - m20) * inv_t;
+    } else {
+        double t = std::sqrt(1.0 + m22 - m00 - m11);
+        double inv_t = 0.5 / t;
+        q.x = (m02 + m20) * inv_t;
+        q.y = (m12 + m21) * inv_t;
+        q.z = 0.5 * t;
+        q.w = (m10 - m01) * inv_t;
+    }
+
+    // 4. Normalize (for numerical robustness)
+    return q.normalized();
+}
+
+
 Transform Transform::perspective(double fov_rad, double aspect, double z_near, double z_far) {
     // [f/aspect, 0, 0, 0]
     // [0, f, 0, 0]

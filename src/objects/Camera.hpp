@@ -25,7 +25,7 @@ public:
           )),
           controller(std::move(controller)) {
         properties = properties | SceneProperties::CAMERA;
-        position = pos;
+        set_position(pos);
     }
 
     Camera(Camera&& other) noexcept

@@ -13,10 +13,10 @@ void Camera::update(double delta_t) {
 
 Transform Camera::get_view_matrix() const {
     // Camera world position
-    Vector3 eye = get_position();
+    Vector3 eye = get_global_position();
 
     // Use a normalized copy of the rotation
-    Quaternion q = rotation.normalized();
+    Quaternion q = get_rotation().normalized();
 
     // Local helper to rotate a vector by quaternion: v' = q * v * q^{-1}
     auto rotate_vec = [&](const Vector3& v) -> Vector3 {
@@ -26,12 +26,11 @@ Transform Camera::get_view_matrix() const {
         return {r.x, r.y, r.z};
     };
 
-    // Your conventions: +Z forward, +Y up in local space
-    const Vector3 local_forward{0.0, 0.0, 1.0};
-    const Vector3 local_up     {0.0, 1.0, 0.0};
+    const Vector3 global_forward{0.0, 0.0, -1.0};
+    const Vector3 global_up     {0.0, 1.0, 0.0};
 
-    Vector3 forward = rotate_vec(local_forward);
-    Vector3 up      = rotate_vec(local_up);
+    Vector3 forward = rotate_vec(global_forward);
+    Vector3 up      = rotate_vec(global_up);
 
     return look_at(eye, eye + forward, up);
 }

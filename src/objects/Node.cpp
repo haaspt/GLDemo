@@ -7,11 +7,14 @@ void Node::mark_children_for_deletion() const {
     }
 }
 
-
-void Node::set_dirty_flag() const {
-    is_transform_dirty = true;
-    for (auto child_id: children_) {
-        scene->get_scene_object(child_id)->set_dirty_flag();
+void Node::set_transform_dirty(bool global) const {
+    if (global) {
+        is_global_transform_dirty = true;
+    } else {
+        is_local_transform_dirty = true;
+    }
+    for (const auto child_id :children_) {
+        scene->get_scene_object(child_id)->set_transform_dirty(true);
     }
 }
 
@@ -28,6 +31,7 @@ Node::NodeId Node::add_child(NodeId child_id) {
     const auto& child = scene->get_scene_object(child_id);
     assert(!child->parent_id);
     child->parent_id = id;
+    child->set_transform_dirty(true);
     return child_id;
 }
 
@@ -49,6 +53,7 @@ bool Node::detatch_from_parent() const {
     if (!parent) {
         return false;
     }
+    set_transform_dirty(true);
     return parent->children_.erase(id);
 }
 
@@ -65,35 +70,45 @@ bool Node::remove_child(NodeId child_id) {
     return true;
 }
 
-const Transform& Node::get_transform() const {
-    return transform;
-}
-
-
-const Transform& Node::get_clean_transform() const {
-    if (is_transform_dirty) {
-        update_transform();
+const Transform &Node::get_local_transform() const {
+    if (is_local_transform_dirty) {
+        update_local_transform();
     }
-    return transform;
+    return local_transform;
 }
 
-void Node::update_transform() const {
+const Transform &Node::get_global_transform() const {
+    if (is_global_transform_dirty) {
+        update_global_transform();
+    }
+    return global_transform;
+}
+
+void Node::update_local_transform() const {
+    local_transform = Transform(1.0);
+    local_transform.translate(position);
+    local_transform *= Transform(rotation);
+    local_transform.scale(scale);
+
+    is_local_transform_dirty = false;
+}
+
+void Node::update_global_transform() const {
     if (parent_id) {
-        transform = scene->get_scene_object(parent_id)->get_transform();
+        global_transform = scene->get_scene_object(parent_id)->get_global_transform();
     } else {
-        transform = Transform(1.0);
+        global_transform = Transform(1.0);
     }
 
-    transform.translate(position);
+    global_transform = global_transform * get_local_transform();
 
-    transform *= Transform(rotation);
-
-    transform.scale(scale);
-    is_transform_dirty = false;
+    is_local_transform_dirty = false;
 }
 
 void Node::update(double const delta_t) {
     process(delta_t);
-    position += velocity * delta_t;
-    set_dirty_flag();
+    if (velocity.magnitude() != 0.0) {
+        position += velocity * delta_t;
+        set_transform_dirty();
+    }
 }

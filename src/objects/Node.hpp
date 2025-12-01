@@ -27,14 +27,23 @@ private:
 
     NodeId id;
 
-    mutable Transform transform = Transform(1.0);
-    mutable bool is_transform_dirty = false;
+    mutable Transform local_transform = Transform(1.0);
+    mutable Transform global_transform = Transform(1.0);
+
+    mutable bool is_local_transform_dirty = false;
+    mutable bool is_global_transform_dirty = true;
 
     bool should_be_deleted = false;
 
     void mark_children_for_deletion() const;
 
-    void update_transform() const;
+    void update_local_transform() const;
+    void update_global_transform() const;
+
+    Vector3 velocity = Vector3(0.0);
+    Vector3 position = Vector3(0.0);
+    Vector3 scale = Vector3(1.0);
+    Quaternion rotation = Quaternion();
 
 protected:
     NodeId parent_id = 0;
@@ -42,12 +51,8 @@ protected:
     std::unordered_set<NodeId> children_;
 
     SceneProperties properties;
-    Vector3 velocity = Vector3(0.0);
-    Vector3 position = Vector3(0.0);
-    Vector3 scale = Vector3(1.0);
-    Quaternion rotation = Quaternion();
 
-    void set_dirty_flag() const;
+    void set_transform_dirty(bool global=false) const;
 
     void set_for_deletion();
 
@@ -91,7 +96,9 @@ public:
 
     void set_velocity(Vector3 vel) {
         velocity = vel;
-        set_dirty_flag();
+        if (!is_local_transform_dirty) {
+            set_transform_dirty();
+        }
     }
 
     void set_velocity(double const x_vel, double const y_vel, double const z_vel) {
@@ -99,12 +106,18 @@ public:
     }
 
     Vector3 get_position() const {
-        return position;
+        return get_local_transform().get_translation();
+    }
+
+    Vector3 get_global_position() const {
+        return get_global_transform().get_translation();
     }
 
     void set_position(Vector3 const pos) {
         position = pos;
-        set_dirty_flag();
+        if (!is_local_transform_dirty) {
+            set_transform_dirty();
+        }
     }
 
     void set_position(double const x, double const y, double const z) {
@@ -112,33 +125,33 @@ public:
     }
 
     Vector3 get_scale() const {
-        return scale;
+        return get_local_transform().get_scale();
     }
 
     void set_scale(Vector3 scl) {
         scale = scl;
-        set_dirty_flag();
+        if (!is_local_transform_dirty) {
+            set_transform_dirty();
+        }
     }
 
     void set_scale(double const x, double const y, double const z) {
         set_scale({x, y, z});
     }
 
-    Vector3 get_rotation_rad() const {
-        return rotation.to_euler();
-    }
-
     void set_rotation_rad(Vector3 rot_rad) {
         rotation = Quaternion::from_euler(rot_rad).normalized();
-        set_dirty_flag();
+        if (!is_local_transform_dirty) {
+            set_transform_dirty();
+        }
+    }
+
+    Quaternion get_rotation() const {
+        return get_local_transform().get_rotation();
     }
 
     void set_rotation_rad(double const x_rad, double const y_rad, double const z_rad) {
         set_rotation_rad({x_rad, y_rad, z_rad});
-    }
-
-    Vector3 get_rotation_deg() const {
-        return get_rotation_rad().to_degrees();
     }
 
     void set_rotation_deg(Vector3 rot_deg) {
@@ -158,7 +171,9 @@ public:
         // rotation = delta * rotation;
 
         rotation = (delta * rotation).normalized();
-        set_dirty_flag();
+        if (!is_local_transform_dirty) {
+            set_transform_dirty();
+        }
     }
 
     void rotate_rad(double const x_rad, double const y_rad, double const z_rad) {
@@ -173,9 +188,8 @@ public:
         rotate_rad(Vector3(x_deg, y_deg, z_deg).to_radians());
     }
 
-    const Transform& get_transform() const;
-
-    const Transform& get_clean_transform() const;
+    const Transform& get_local_transform() const;
+    const Transform& get_global_transform() const;
 };
 
 constexpr Node::SceneProperties operator|(Node::SceneProperties a, Node::SceneProperties b) {

@@ -57,6 +57,7 @@ namespace Scene {
                 assert(it != scene_objects_.end());
                 auto parent = it->second.get();
                 parent->children_.insert(id);
+                node->set_transform_dirty(true);
                 scene_objects_[id]->parent_id = parent_node_id;
             }
             return id;

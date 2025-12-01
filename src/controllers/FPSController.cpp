@@ -13,7 +13,7 @@ void FPSController::update(Node& node, double delta_t) {
     Vector2 cursor_move_vec = Input::get_cursor_vec();
 
     yaw += -cursor_move_vec.x * look_speed;
-    pitch += cursor_move_vec.y * look_speed;
+    pitch += -cursor_move_vec.y * look_speed;
 
     constexpr double max_pitch = Utils::to_radians(89.0);
     pitch = Utils::clamp(pitch, -max_pitch, max_pitch);
@@ -21,7 +21,7 @@ void FPSController::update(Node& node, double delta_t) {
     node.set_rotation_rad({pitch, yaw, 0.0});
 
     // Movement
-    const Transform &trans = node.get_transform();
+    const Transform &trans = node.get_local_transform();
 
     // Forward basis from transform column
     Vector3 forward = Vector3(trans.at(0, 2), trans.at(1, 2), trans.at(2, 2)).normalized();
@@ -39,9 +39,9 @@ void FPSController::update(Node& node, double delta_t) {
 
     Vector3 input_vec = Input::get_input_vec();
 
-    double strafe = input_vec.x;
+    double strafe = -input_vec.x;
     double lift = input_vec.z;
-    double fwd = input_vec.y;
+    double fwd = -input_vec.y;
 
     Vector3 local_vec{strafe, lift, fwd};
     local_vec.normalize();

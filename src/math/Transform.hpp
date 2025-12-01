@@ -72,9 +72,16 @@ public:
 
     Transform& rotate(double radians, const Vector3& axis);
 
+    Vector3 get_translation() const;
+
+    Vector3 get_scale() const;
+
+    Quaternion get_rotation() const;
+
     static Transform perspective(double fov_rad, double aspect, double z_near, double z_far);
 
     glm::mat4 to_glm() const {
+        // Convert from row-major to GLM's column-major order
         return {
             // column 0
             static_cast<float>(data[0]),  static_cast<float>(data[4]),
