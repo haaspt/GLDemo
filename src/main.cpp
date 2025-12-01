@@ -63,14 +63,14 @@ int main(int /*argc*/, char** argv) {
 
     auto ship = main_scene.create_object<GameObject>("fighter.gltf", "default");
     main_scene.get_scene_object(ship)->rotate_deg(0, 0, 0);
-    main_scene.get_scene_object(ship)->set_position(0, -5, -15);
+    main_scene.get_scene_object(ship)->set_position(0, 0, 0);
 
     auto camera = main_scene.create_object<Camera>(
         65.0,
         static_cast<double>(W_WIDTH) / W_HEIGHT,
         0.1,
         500.0,
-        Vector3(0, 0, 0),
+        Vector3(0, 5, 15),
         std::make_unique<FPSController>(3.0, 0.15)
     );
 
@@ -82,7 +82,7 @@ int main(int /*argc*/, char** argv) {
     main_scene.get_scene_object(suzanne)->set_position(0, 0, -20);
 
 
-    main_scene.get_scene_object(camera)->add_child(ship);
+    main_scene.get_scene_object(ship)->add_child(light_source);
 
 
     // Skybox
@@ -122,6 +122,8 @@ int main(int /*argc*/, char** argv) {
 
 
         Input::poll();
+
+        main_scene.get_scene_object(ship)->rotate_deg({0, 0, 1});
 
         main_scene.update(delta_t);
         main_scene.render();
