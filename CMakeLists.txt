@@ -117,6 +117,8 @@ add_executable(GLDemo
         src/resources/Skybox.cpp
         src/resources/Skybox.hpp
         src/scene/Scene.hpp
+        src/controllers/FollowController.cpp
+        src/controllers/FollowController.hpp
 )
 
 target_include_directories(GLDemo PRIVATE ${CMAKE_SOURCE_DIR}/src)

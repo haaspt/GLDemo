@@ -12,6 +12,7 @@
 #include "math/Vector.hpp"
 #include "resources/ResourceManager.hpp"
 #include "controllers/FPSController.hpp"
+#include "controllers/FollowController.hpp"
 #include "scene/Scene.hpp"
 
 
@@ -61,7 +62,7 @@ int main(int /*argc*/, char** argv) {
 
     Scene::Scene main_scene = Scene::Scene();
 
-    auto ship = main_scene.create_object<GameObject>("fighter.gltf", "default");
+    auto ship = main_scene.create_object<GameObject>("fighter.gltf", "default", std::make_unique<FPSController>(3.0, 0.15));
     main_scene.get_scene_object(ship)->rotate_deg(0, 0, 0);
     main_scene.get_scene_object(ship)->set_position(0, 0, 0);
 
@@ -70,8 +71,8 @@ int main(int /*argc*/, char** argv) {
         static_cast<double>(W_WIDTH) / W_HEIGHT,
         0.1,
         500.0,
-        Vector3(0, 5, 15),
-        std::make_unique<FPSController>(3.0, 0.15)
+        Vector3(0, 0, 0),
+        std::make_unique<FollowController>(Vector3(0, 5, 15), main_scene.get_scene_object(ship))
     );
 
     auto light_source = main_scene.create_object<LightSource>("sphere.gltf", Vector3{1.0}, 0.4);
