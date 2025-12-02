@@ -139,11 +139,16 @@ public:
         set_scale({x, y, z});
     }
 
-    void set_rotation_rad(Vector3 rot_rad) {
-        rotation = Quaternion::from_euler(rot_rad).normalized();
+    void set_rotation(const Quaternion& rot) {
+        rotation = rot;
         if (!is_local_transform_dirty) {
             set_transform_dirty();
         }
+    }
+
+    void set_rotation_rad(Vector3 rot_rad) {
+        set_rotation(Quaternion::from_euler(rot_rad).normalized());
+
     }
 
     Quaternion get_rotation() const {
@@ -162,18 +167,17 @@ public:
         set_rotation_rad(Vector3(x_deg, y_deg, z_deg).to_radians());
     }
 
-    void rotate_rad(const Vector3& rot_rad) {
-        Quaternion delta = Quaternion::from_euler(rot_rad);
-
-        // local space
-        // rotation = rotation * delta;
-        // world space
-        // rotation = delta * rotation;
-
+    void rotate(const Quaternion& delta) {
         rotation = (delta * rotation).normalized();
         if (!is_local_transform_dirty) {
             set_transform_dirty();
         }
+    }
+
+    void rotate_rad(const Vector3& rot_rad) {
+        Quaternion delta = Quaternion::from_euler(rot_rad);
+
+        rotate(delta);
     }
 
     void rotate_rad(double const x_rad, double const y_rad, double const z_rad) {
