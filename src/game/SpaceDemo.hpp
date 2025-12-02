@@ -15,27 +15,56 @@
 
 class ShipNode : public Node {
 private:
-    Node* ship_mesh = nullptr;
+    Node *ship_mesh = nullptr;
     Vector2 mesh_tilt;
+    Vector2 smoothed_cursor{0};
 
 public:
-    void set_ship_mesh(Node* ptr) { ship_mesh = ptr; }
+    void set_ship_mesh(Node *ptr) { ship_mesh = ptr; }
 
     void update(double delta_t) override {
         if (controller_) controller_->update(*this, delta_t);
         set_position(get_position() + get_velocity());
 
         if (ship_mesh) {
-            Vector2 cursor = Input::get_cursor_vec();
-            Vector2 target(-cursor.y, cursor.x);
+            Vector2 raw_cursor = Input::get_cursor_vec();
 
-            double speed = 1.0;
-            mesh_tilt += (target - mesh_tilt) * delta_t * speed;
+            // Low pass filter, prevents jittery model movement
+            double input_smooth_speed = 10.0;
+            double alpha = 1.0 - std::exp(-input_smooth_speed * delta_t);
 
-            double pitch_deg = Utils::clamp(mesh_tilt.x * 20.0, -15.0, 10.0);
-            double roll_deg = Utils::clamp(mesh_tilt.y * 20.0, -45.0, 45.0);
+            smoothed_cursor += (raw_cursor - smoothed_cursor) * alpha;
 
-            ship_mesh->set_rotation_deg(pitch_deg, 0.0, -roll_deg);
+            constexpr double max_visual_pitch_deg = 15.0;
+            constexpr double max_visual_roll_deg = 55.0;
+            constexpr double max_visual_yaw_deg = 30.0;
+
+            double max_visual_pitch = Utils::to_radians(max_visual_pitch_deg);
+            double max_visual_roll = Utils::to_radians(max_visual_roll_deg);
+            double max_visual_yaw = Utils::to_radians(max_visual_yaw_deg);
+
+            double target_pitch = Utils::clamp(-smoothed_cursor.y * max_visual_pitch,
+                                               -max_visual_pitch,
+                                               max_visual_pitch);
+
+            double target_yaw = Utils::clamp(-smoothed_cursor.x * max_visual_yaw,
+                                             -max_visual_yaw,
+                                             max_visual_yaw);
+            double target_roll = Utils::clamp(-smoothed_cursor.x * max_visual_roll,
+                                              -max_visual_roll,
+                                              max_visual_roll);
+
+            Quaternion target_rot = Quaternion::from_euler(
+                Vector3(target_pitch, target_yaw, target_roll)
+            );
+
+            Quaternion current = ship_mesh->get_local_transform().get_rotation().normalized();
+
+            double follow_speed = 2.0;
+            double w = 1.0 - std::exp(-follow_speed * delta_t);
+
+            Quaternion new_rot = current.slerp(target_rot, w).normalized();
+            ship_mesh->set_rotation(new_rot);
         }
     }
 };
@@ -43,51 +72,59 @@ public:
 
 class ShipController : public BaseController {
 private:
-    double max_velocity = 1.0;
-    double linear_accel = 10.0;
-    double linear_decel = 10.0;
-    double turn_speed = 0.005;
+    double base_speed = 5.0;
+    double max_speed = 25.0;
+    double accel_rate = 20.0;
+    double strafe_damping = 16.0;
+    double turn_speed = 0.25;
 
     double yaw = 0.0;
     double pitch = 0.0;
 
 public:
-    void update(Node& node, double dt) override {
-        Vector2 cursor = Input::get_cursor_vec();
-        yaw += -cursor.x * turn_speed;
-        pitch += -cursor.y * turn_speed;
+    void update(Node &node, double delta_t) override {
+        Vector2 cursor_move = Input::get_cursor_vec();
 
-        constexpr double max_pitch = Utils::to_radians(89.0);
-        pitch = Utils::clamp(pitch, -max_pitch, max_pitch);
+        yaw += -cursor_move.x * turn_speed * delta_t;
+        pitch += -cursor_move.y * turn_speed * delta_t;
 
-        node.set_rotation_rad({pitch, yaw, 0.0});
+        // constexpr double max_pitch = Utils::to_radians(89.0);
+        // pitch = Utils::clamp(pitch, -max_pitch, max_pitch);
 
-        const Transform& t = node.get_local_transform();
+        node.set_rotation_rad({pitch, yaw, 0.0}); // yaw and pitch around, no roll
+
+        const Transform &t = node.get_local_transform();
         Vector3 forward = t.get_forward();
 
         Vector3 vel = node.get_velocity();
-        Vector3 accel(0, 0, 0);
 
-        Vector3 input = Input::get_input_vec();
-        double thrust = std::max(0.0, input.y);   // forward only
+        // Decompose velocity into forward and lateral components
+        double forward_speed = vel.dot(forward);
+        Vector3 v_forward = forward * forward_speed;
+        Vector3 v_lateral = vel - v_forward;
 
-        if (thrust > 0.0)
-            accel += forward * (thrust * linear_accel);
 
-        if (accel.magnitude() > 0.0) {
-            vel += accel * dt;
-        } else {
-            double speed = vel.magnitude();
-            if (speed > 0.0) {
-                double decel_amount = linear_decel * dt;
-                double new_speed = std::max(0.0, speed - decel_amount);
-                vel = vel.normalized() * new_speed;
-            }
-        }
+        double thrust_amt = Input::get_input_vec().y;
+        double thrust = Utils::clamp(thrust_amt, 0.0, 1.0);
 
-        if (vel.magnitude() > max_velocity)
-            vel = vel.normalized() * max_velocity;
+        double target_speed = base_speed + thrust * (max_speed - base_speed);
 
+        // Accel towards target speed
+        double speed_delta = target_speed - forward_speed;
+        double max_delta = accel_rate * delta_t;
+
+        if (speed_delta > max_delta) speed_delta = max_delta;
+        else if (speed_delta < -max_delta) speed_delta = -max_delta;
+
+        forward_speed += speed_delta;
+        v_forward = forward * forward_speed;
+
+        // Damp lateral movement
+        double damping = std::exp(-strafe_damping * delta_t);
+        v_lateral *= damping;
+
+        // --- 6. Recombine velocity ---
+        vel = v_forward + v_lateral;
         node.set_velocity(vel);
     }
 };
@@ -95,18 +132,19 @@ public:
 struct ShipPrefab : Scene::Prefab {
     double aspect_ratio;
 
-    Scene::NodeId initialize(Scene::Scene& scene, Scene::NodeId parent_id) override {
+    Scene::NodeId initialize(Scene::Scene &scene, Scene::NodeId parent_id) override {
         auto root = std::make_unique<ShipNode>();
         root->set_controller(std::make_unique<ShipController>());
         auto root_id = scene.add_scene_object(std::move(root), parent_id);
+        scene.get_scene_object(root_id).set_position(0, 0, 1000);
 
-        auto camera = std::make_unique<Camera>(65.0, aspect_ratio, 0.1, 1000.0, Vector3(0, 5, 15));
+        auto camera = std::make_unique<Camera>(65.0, aspect_ratio, 0.1, 10000.0, Vector3(0, 5, 15));
         scene.add_scene_object(std::move(camera), root_id);
 
         auto ship_mesh = std::make_unique<GameObject>("fighter.gltf", "default");
         auto ship_id = scene.add_scene_object(std::move(ship_mesh), root_id);
 
-        dynamic_cast<ShipNode*>(&scene.get_scene_object(root_id))->set_ship_mesh(&scene.get_scene_object(ship_id));
+        dynamic_cast<ShipNode *>(&scene.get_scene_object(root_id))->set_ship_mesh(&scene.get_scene_object(ship_id));
 
         auto exhaust_light = std::make_unique<LightSource>("sphere.gltf", Vector3{1.0}, 0.4);
         exhaust_light->set_position(0, 0, 3).set_scale(0.5, 0.5, 0.5);
