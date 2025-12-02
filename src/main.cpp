@@ -62,7 +62,7 @@ int main(int /*argc*/, char** argv) {
 
     Scene::Scene main_scene = Scene::Scene();
 
-    auto ship = main_scene.create_object<GameObject>("fighter.gltf", "default", std::make_unique<FPSController>(3.0, 0.15));
+    auto ship = main_scene.create_object<GameObject>("fighter.gltf", "default", std::make_unique<FPSController>(50.0, 0.1));
     main_scene.get_scene_object(ship)->rotate_deg(0, 0, 0);
     main_scene.get_scene_object(ship)->set_position(0, 0, 0);
 
@@ -76,7 +76,7 @@ int main(int /*argc*/, char** argv) {
     );
 
     auto light_source = main_scene.create_object<LightSource>("sphere.gltf", Vector3{1.0}, 0.4);
-    main_scene.get_scene_object(light_source)->set_position(1.75, 0, -2.75);
+    main_scene.get_scene_object(light_source)->set_position(0, 0, 3);
     main_scene.get_scene_object(light_source)->set_scale(0.5, 0.5, 0.5);
 
     auto suzanne = main_scene.create_object<GameObject>("suzanne.gltf", "default");
