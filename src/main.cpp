@@ -63,9 +63,9 @@ int main(int /*argc*/, char** argv) {
 
     for (unsigned int i = 0; i < 100; i++) {
         Vector3 spawn_point = {
-            Utils::Random::range(-250.0f, 250.0),
-            Utils::Random::range(-250.0f, 250.0),
-            Utils::Random::range(-250.0f, 250.0)
+            Utils::Random::range(-250.0f, 1000.0),
+            Utils::Random::range(-250.0f, 1000.0),
+            Utils::Random::range(-250.0f, 1000.0)
         };
         Vector3 spawn_rotation = {
             90.0 * Utils::Random::range(0, 4),
