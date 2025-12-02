@@ -12,7 +12,6 @@
 class Camera : public Node {
 private:
     Transform projection;
-    std::unique_ptr<BaseController> controller = nullptr;
 
 public:
     Camera(double fov_deg, double aspect_ratio, double near_plane_dist, double far_plane_dist,
@@ -22,17 +21,17 @@ public:
               aspect_ratio,
               near_plane_dist,
               far_plane_dist
-          )),
-          controller(std::move(controller)) {
+          )) {
+        controller_ = std::move(controller);
         properties = properties | SceneProperties::CAMERA;
         set_position(pos);
     }
 
     Camera(Camera&& other) noexcept
         : Node(std::move(other)),
-          projection(other.projection),
-          controller(std::move(other.controller)) {
-        other.controller = nullptr;
+          projection(other.projection) {
+        controller_ = std::move(other.controller_);
+        other.controller_ = nullptr;
     }
 
     Camera& operator=(Camera&& other) noexcept {
@@ -40,12 +39,10 @@ public:
             Node::operator=(std::move(other));
 
             projection = other.projection;
-            controller = std::move(other.controller);
+            controller_ = std::move(other.controller_);
         }
         return *this;
     }
-
-    void set_controller(std::unique_ptr<BaseController> new_controller) { controller = std::move(new_controller); }
 
     void update(double delta_t) override;
 

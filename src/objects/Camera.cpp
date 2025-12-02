@@ -6,8 +6,8 @@
 #include "math/Transform.hpp"
 
 void Camera::update(double delta_t) {
-    if (controller) {
-        controller->update(*this, delta_t);
+    if (controller_) {
+        controller_->update(*this, delta_t);
     }
 }
 
@@ -16,7 +16,7 @@ Transform Camera::get_view_matrix() const {
     Vector3 eye = get_global_position();
 
     // Use a normalized copy of the rotation
-    Quaternion q = get_rotation().normalized();
+    Quaternion q = get_global_transform().get_rotation();
 
     // Local helper to rotate a vector by quaternion: v' = q * v * q^{-1}
     auto rotate_vec = [&](const Vector3& v) -> Vector3 {

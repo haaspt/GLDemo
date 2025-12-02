@@ -19,7 +19,7 @@ void GameObject::render(const Camera* camera, const std::vector<const LightSourc
 }
 
 void GameObject::process(double delta_t) {
-    if (controller) {
-        controller->update(*this, delta_t);
+    if (controller_) {
+        controller_->update(*this, delta_t);
     }
 }

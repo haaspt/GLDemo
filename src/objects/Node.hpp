@@ -6,6 +6,7 @@
 #include "math/Transform.hpp"
 #include "math/Quaternion.hpp"
 #include "utilities/Utils.hpp"
+#include "controllers/BaseController.hpp"
 
 namespace Scene {
     class Scene;
@@ -52,6 +53,8 @@ protected:
     std::unordered_set<NodeId> children_;
 
     SceneProperties properties;
+
+    std::unique_ptr<BaseController> controller_ = nullptr;
 
     void set_transform_dirty(bool global = false) const;
 
@@ -200,6 +203,8 @@ public:
     const Transform& get_local_transform() const;
 
     const Transform& get_global_transform() const;
+
+    virtual void set_controller(std::unique_ptr<BaseController> new_controller) { controller_ = std::move(new_controller); }
 };
 
 constexpr Node::SceneProperties operator|(Node::SceneProperties a, Node::SceneProperties b) {
