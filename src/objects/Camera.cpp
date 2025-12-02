@@ -11,14 +11,19 @@ void Camera::update(double delta_t) {
     }
 }
 
-Transform Camera::get_view_matrix() const {
-    // Camera world position
+const Transform& Camera::get_view_matrix() const {
+    if (get_transform_dirty_state(true)) {
+        update_view_matrix();
+    }
+    return view;
+}
+
+void Camera::update_view_matrix() const {
     Vector3 eye = get_global_position();
 
-    // Use a normalized copy of the rotation
-    Quaternion q = get_global_transform().get_rotation();
+    Quaternion q = get_global_transform().get_rotation();  // Sets transform flag clean
 
-    // Local helper to rotate a vector by quaternion: v' = q * v * q^{-1}
+    // TODO: move this to Vector.hpp
     auto rotate_vec = [&](const Vector3& v) -> Vector3 {
         Quaternion p{v.x, v.y, v.z, 0.0};   // pure quaternion
         Quaternion inv = q.get_inverse();    // assumes q is normalized
@@ -32,5 +37,5 @@ Transform Camera::get_view_matrix() const {
     Vector3 forward = rotate_vec(global_forward);
     Vector3 up      = rotate_vec(global_up);
 
-    return look_at(eye, eye + forward, up);
+    view = look_at(eye, eye + forward, up);
 }

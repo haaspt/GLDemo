@@ -12,6 +12,9 @@
 class Camera : public Node {
 private:
     Transform projection;
+    mutable Transform view{};
+
+    void update_view_matrix() const;
 
 public:
     Camera(double fov_deg, double aspect_ratio, double near_plane_dist, double far_plane_dist,
@@ -29,23 +32,17 @@ public:
 
     Camera(Camera&& other) noexcept
         : Node(std::move(other)),
-          projection(other.projection) {
-        controller_ = std::move(other.controller_);
-        other.controller_ = nullptr;
-    }
+          projection(other.projection) {}
 
     Camera& operator=(Camera&& other) noexcept {
         if (this != &other) {
             Node::operator=(std::move(other));
-
-            projection = other.projection;
-            controller_ = std::move(other.controller_);
         }
         return *this;
     }
 
     void update(double delta_t) override;
 
-    Transform get_view_matrix() const;
+    const Transform& get_view_matrix() const;
     const Transform& get_projection_matrix() const { return projection; }
 };

@@ -56,6 +56,11 @@ protected:
 
     std::unique_ptr<BaseController> controller_ = nullptr;
 
+    bool get_transform_dirty_state(bool global = false) const {
+        if (global) return is_global_transform_dirty;
+        return is_local_transform_dirty;
+    }
+
     void set_transform_dirty(bool global = false) const;
 
     void set_for_deletion();
@@ -67,7 +72,7 @@ public:
     Node() : id(Utils::IdGen::get_id()), properties(SceneProperties::NONE) {
     }
 
-    virtual ~Node() noexcept { children_.clear(); }
+    virtual ~Node() noexcept = default;
 
     Node(const Node& ) = delete;
 

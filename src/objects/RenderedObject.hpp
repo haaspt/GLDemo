@@ -51,11 +51,13 @@ public:
           model(other.model),
           shader(other.shader),
           model_name(std::move(other.model_name)),
-          shader_name(std::move(other.shader_name)) {
+          shader_name(std::move(other.shader_name)),
+          texture_name(std::move(other.texture_name)) {
         other.shader = nullptr;
         other.model = nullptr;
         other.model_name.clear();
         other.shader_name.clear();
+        other.texture_name.clear();
     }
 
     RenderedObject& operator=(RenderedObject&& other) noexcept {
@@ -72,11 +74,13 @@ public:
             shader = other.shader;
             model_name = std::move(other.model_name);
             shader_name = std::move(other.shader_name);
+            texture_name = std::move(other.texture_name);
 
             other.shader = nullptr;
             other.model = nullptr;
             other.model_name.clear();
             other.shader_name.clear();
+            other.texture_name.clear();
         }
         return *this;
     }
