@@ -119,6 +119,8 @@ add_executable(GLDemo
         src/scene/Scene.hpp
         src/controllers/FollowController.cpp
         src/controllers/FollowController.hpp
+        src/scene/Prefab.hpp
+        src/game/SpaceDemo.hpp
 )
 
 target_include_directories(GLDemo PRIVATE ${CMAKE_SOURCE_DIR}/src)

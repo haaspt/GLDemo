@@ -5,15 +5,11 @@
 #include <OpenGL/gl3.h>
 #include <GLFW/glfw3.h>
 
-#include "objects/Camera.hpp"
-#include "objects/GameObject.hpp"
-#include "objects/LightSource.hpp"
 #include "utilities/Input.hpp"
-#include "math/Vector.hpp"
 #include "resources/ResourceManager.hpp"
-#include "controllers/FPSController.hpp"
-#include "controllers/FollowController.hpp"
 #include "scene/Scene.hpp"
+
+#include "game/SpaceDemo.hpp"
 
 
 constexpr unsigned int W_WIDTH = 1200;
@@ -61,38 +57,25 @@ int main(int /*argc*/, char** argv) {
     Input::initialize(window);
 
     Scene::Scene main_scene = Scene::Scene();
+    auto ship_prefab = ShipPrefab();
+    ship_prefab.aspect_ratio = static_cast<double>(W_WIDTH) / W_HEIGHT;
+    ship_prefab.initialize(main_scene, 0);
 
-    auto ship = main_scene.create_object<GameObject>("fighter.gltf", "default",
-                                                     std::make_unique<FPSController>(50.0, 0.1));
-    main_scene.get_scene_object(ship).rotate_deg(0, 0, 0).set_position(0, 0, 0);
+    for (unsigned int i = 0; i < 100; i++) {
+        Vector3 spawn_point = {
+            Utils::Random::range(-250.0f, 250.0),
+            Utils::Random::range(-250.0f, 250.0),
+            Utils::Random::range(-250.0f, 250.0)
+        };
+        Vector3 spawn_rotation = {
+            90.0 * Utils::Random::range(0, 4),
+            90.0 * Utils::Random::range(0, 4),
+            90.0 * Utils::Random::range(0, 4)
+        };
+        auto suzanne = main_scene.create_object<GameObject>("suzanne.gltf", "default");
+        main_scene.get_scene_object(suzanne).set_position(spawn_point).set_rotation_deg(spawn_rotation).set_scale(7,7,7);
+    }
 
-    auto camera = main_scene.create_object<Camera>(
-        65.0,
-        static_cast<double>(W_WIDTH) / W_HEIGHT,
-        0.1,
-        500.0,
-        Vector3(0, 0, 0),
-        std::make_unique<FollowController>(Vector3(0, 5, 15), &main_scene.get_scene_object(ship))
-    );
-
-    auto light_source = main_scene.create_object<LightSource>("sphere.gltf", Vector3{1.0}, 0.4);
-    main_scene.get_scene_object(light_source).set_position(0, 0, 3).set_scale(0.5, 0.5, 0.5);
-
-    auto suzanne = main_scene.create_object<GameObject>("suzanne.gltf", "default");
-    main_scene.get_scene_object(suzanne).set_position(0, 0, -20);
-
-
-    main_scene.get_scene_object(ship).add_child(light_source);
-
-    // Skybox
-    // std::vector<std::string> skybox_textures = {
-    //     exe_dir_path / "textures/skybox/right.png",
-    //     exe_dir_path / "textures/skybox/left.png",
-    //     exe_dir_path / "textures/skybox/top.png",
-    //     exe_dir_path / "textures/skybox/bottom.png",
-    //     exe_dir_path / "textures/skybox/front.png",
-    //     exe_dir_path / "textures/skybox/back.png",
-    // };
     std::vector<std::string> skybox_textures = {
         exe_dir_path / "textures/skybox/px.png",
         exe_dir_path / "textures/skybox/nx.png",
