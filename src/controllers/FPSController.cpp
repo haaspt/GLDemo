@@ -24,7 +24,7 @@ void FPSController::update(Node& node, double delta_t) {
     const Transform &trans = node.get_local_transform();
 
     // Forward basis from transform column
-    Vector3 forward = Vector3(trans.at(0, 2), trans.at(1, 2), trans.at(2, 2)).normalized();
+    Vector3 forward = trans.get_forward();
 
     // Global up
     const Vector3 world_up{0.0, 1.0, 0.0};
@@ -39,9 +39,9 @@ void FPSController::update(Node& node, double delta_t) {
 
     Vector3 input_vec = Input::get_input_vec();
 
-    double strafe = -input_vec.x;
+    double strafe = input_vec.x;
     double lift = input_vec.z;
-    double fwd = -input_vec.y;
+    double fwd = input_vec.y;
 
     Vector3 local_vec{strafe, lift, fwd};
     local_vec.normalize();
