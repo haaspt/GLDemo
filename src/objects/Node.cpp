@@ -3,7 +3,7 @@
 
 void Node::mark_children_for_deletion() const {
     for (auto child_id: children_) {
-        scene->get_scene_object(child_id)->set_for_deletion();
+        scene->get_scene_object(child_id).set_for_deletion();
     }
 }
 
@@ -13,15 +13,15 @@ void Node::set_transform_dirty(bool global) const {
     } else {
         is_local_transform_dirty = true;
     }
-    for (const auto child_id :children_) {
-        scene->get_scene_object(child_id)->set_transform_dirty(true);
+    for (const auto child_id: children_) {
+        scene->get_scene_object(child_id).set_transform_dirty(true);
     }
 }
 
 void Node::set_for_deletion() {
     should_be_deleted = true;
     for (auto child_id: children_) {
-        scene->get_scene_object(child_id)->set_for_deletion();
+        scene->get_scene_object(child_id).set_for_deletion();
     }
 }
 
@@ -29,20 +29,17 @@ Node::NodeId Node::add_child(NodeId child_id) {
     assert(scene);
     assert(child_id != id);
     children_.insert(child_id);
-    const auto& child = scene->get_scene_object(child_id);
-    assert(!child->parent_id);
-    child->parent_id = id;
-    child->set_transform_dirty(true);
+    auto& child = scene->get_scene_object(child_id);
+    assert(!child.parent_id);
+    child.parent_id = id;
+    child.set_transform_dirty(true);
     return child_id;
 }
 
 bool Node::detach_child(NodeId child_id) {
     assert(scene);
-    const auto& child = scene->get_scene_object(child_id);
-    if (!child) {
-        return false;
-    }
-    child->parent_id = 0;
+    auto& child = scene->get_scene_object(child_id);
+    child.parent_id = 0;
     return children_.erase(child_id);
 }
 
@@ -50,35 +47,29 @@ bool Node::detach_from_parent() const {
     if (!parent_id) {
         return false;
     }
-    auto parent = scene->get_scene_object(parent_id);
-    if (!parent) {
-        return false;
-    }
+    auto& parent = scene->get_scene_object(parent_id);
     set_transform_dirty(true);
-    return parent->children_.erase(id);
+    return parent.children_.erase(id);
 }
 
 
 bool Node::remove_child(NodeId child_id) {
     assert(scene);
     assert(children_.erase(child_id) > 0);
-    auto child = scene->get_scene_object(child_id);
-    if (!child) {
-        return false;
-    }
-    child->set_for_deletion();
-    child->mark_children_for_deletion();
+    auto& child = scene->get_scene_object(child_id);
+    child.set_for_deletion();
+    child.mark_children_for_deletion();
     return true;
 }
 
-const Transform &Node::get_local_transform() const {
+const Transform& Node::get_local_transform() const {
     if (is_local_transform_dirty) {
         update_local_transform();
     }
     return local_transform;
 }
 
-const Transform &Node::get_global_transform() const {
+const Transform& Node::get_global_transform() const {
     if (is_global_transform_dirty) {
         update_global_transform();
     }
@@ -96,7 +87,7 @@ void Node::update_local_transform() const {
 
 void Node::update_global_transform() const {
     if (parent_id) {
-        global_transform = scene->get_scene_object(parent_id)->get_global_transform();
+        global_transform = scene->get_scene_object(parent_id).get_global_transform();
     } else {
         global_transform = Transform(1.0);
     }

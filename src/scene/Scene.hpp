@@ -64,12 +64,10 @@ namespace Scene {
             return id;
         }
 
-        Node* get_scene_object(NodeId id) const {
+        Node& get_scene_object(NodeId id) const {
             auto it = scene_objects_.find(id);
-            if (it == scene_objects_.end()) {
-                return nullptr;
-            }
-            return it->second.get();
+            assert(it != scene_objects_.end());
+            return *it->second;
         }
 
         void update(double delta_t) const {

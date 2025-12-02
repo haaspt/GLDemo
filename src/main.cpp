@@ -62,9 +62,9 @@ int main(int /*argc*/, char** argv) {
 
     Scene::Scene main_scene = Scene::Scene();
 
-    auto ship = main_scene.create_object<GameObject>("fighter.gltf", "default", std::make_unique<FPSController>(50.0, 0.1));
-    main_scene.get_scene_object(ship)->rotate_deg(0, 0, 0);
-    main_scene.get_scene_object(ship)->set_position(0, 0, 0);
+    auto ship = main_scene.create_object<GameObject>("fighter.gltf", "default",
+                                                     std::make_unique<FPSController>(50.0, 0.1));
+    main_scene.get_scene_object(ship).rotate_deg(0, 0, 0).set_position(0, 0, 0);
 
     auto camera = main_scene.create_object<Camera>(
         65.0,
@@ -72,19 +72,17 @@ int main(int /*argc*/, char** argv) {
         0.1,
         500.0,
         Vector3(0, 0, 0),
-        std::make_unique<FollowController>(Vector3(0, 5, 15), main_scene.get_scene_object(ship))
+        std::make_unique<FollowController>(Vector3(0, 5, 15), &main_scene.get_scene_object(ship))
     );
 
     auto light_source = main_scene.create_object<LightSource>("sphere.gltf", Vector3{1.0}, 0.4);
-    main_scene.get_scene_object(light_source)->set_position(0, 0, 3);
-    main_scene.get_scene_object(light_source)->set_scale(0.5, 0.5, 0.5);
+    main_scene.get_scene_object(light_source).set_position(0, 0, 3).set_scale(0.5, 0.5, 0.5);
 
     auto suzanne = main_scene.create_object<GameObject>("suzanne.gltf", "default");
-    main_scene.get_scene_object(suzanne)->set_position(0, 0, -20);
+    main_scene.get_scene_object(suzanne).set_position(0, 0, -20);
 
 
-    main_scene.get_scene_object(ship)->add_child(light_source);
-
+    main_scene.get_scene_object(ship).add_child(light_source);
 
     // Skybox
     // std::vector<std::string> skybox_textures = {
@@ -123,8 +121,6 @@ int main(int /*argc*/, char** argv) {
 
 
         Input::poll();
-
-        main_scene.get_scene_object(ship)->rotate_deg({0, 0, 1});
 
         main_scene.update(delta_t);
         main_scene.render();

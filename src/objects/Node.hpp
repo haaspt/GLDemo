@@ -38,6 +38,7 @@ private:
     void mark_children_for_deletion() const;
 
     void update_local_transform() const;
+
     void update_global_transform() const;
 
     Vector3 velocity = Vector3(0.0);
@@ -52,7 +53,7 @@ protected:
 
     SceneProperties properties;
 
-    void set_transform_dirty(bool global=false) const;
+    void set_transform_dirty(bool global = false) const;
 
     void set_for_deletion();
 
@@ -65,9 +66,9 @@ public:
 
     virtual ~Node() noexcept { children_.clear(); }
 
-    Node(const Node&) = delete;
+    Node(const Node& ) = delete;
 
-    Node& operator=(const Node&) = delete;
+    Node& operator=(const Node& ) = delete;
 
     Node(Node&&) noexcept = default;
 
@@ -94,15 +95,16 @@ public:
         return velocity;
     }
 
-    void set_velocity(Vector3 vel) {
+    Node& set_velocity(Vector3 vel) {
         velocity = vel;
         if (!is_local_transform_dirty) {
             set_transform_dirty();
         }
+        return *this;
     }
 
-    void set_velocity(double const x_vel, double const y_vel, double const z_vel) {
-        set_velocity({x_vel, y_vel, z_vel});
+    Node& set_velocity(double const x_vel, double const y_vel, double const z_vel) {
+        return set_velocity({x_vel, y_vel, z_vel});
     }
 
     Vector3 get_position() const {
@@ -113,86 +115,90 @@ public:
         return get_global_transform().get_translation();
     }
 
-    void set_position(Vector3 const pos) {
+    Node& set_position(Vector3 const pos) {
         position = pos;
         if (!is_local_transform_dirty) {
             set_transform_dirty();
         }
+        return *this;
     }
 
-    void set_position(double const x, double const y, double const z) {
-        set_position({x, y, z});
+    Node& set_position(double const x, double const y, double const z) {
+        return set_position({x, y, z});
     }
 
     Vector3 get_scale() const {
         return get_local_transform().get_scale();
     }
 
-    void set_scale(Vector3 scl) {
+    Node& set_scale(Vector3 scl) {
         scale = scl;
         if (!is_local_transform_dirty) {
             set_transform_dirty();
         }
+        return *this;
     }
 
-    void set_scale(double const x, double const y, double const z) {
-        set_scale({x, y, z});
+    Node& set_scale(double const x, double const y, double const z) {
+        return set_scale({x, y, z});
     }
 
-    void set_rotation(const Quaternion& rot) {
+    Node& set_rotation(const Quaternion &rot) {
         rotation = rot;
         if (!is_local_transform_dirty) {
             set_transform_dirty();
         }
+        return *this;
     }
 
-    void set_rotation_rad(Vector3 rot_rad) {
-        set_rotation(Quaternion::from_euler(rot_rad).normalized());
-
+    Node& set_rotation_rad(Vector3 rot_rad) {
+        return set_rotation(Quaternion::from_euler(rot_rad).normalized());
     }
 
     Quaternion get_rotation() const {
         return get_local_transform().get_rotation();
     }
 
-    void set_rotation_rad(double const x_rad, double const y_rad, double const z_rad) {
-        set_rotation_rad({x_rad, y_rad, z_rad});
+    Node& set_rotation_rad(double const x_rad, double const y_rad, double const z_rad) {
+        return set_rotation_rad({x_rad, y_rad, z_rad});
     }
 
-    void set_rotation_deg(Vector3 rot_deg) {
-        set_rotation_rad(rot_deg.to_radians());
+    Node& set_rotation_deg(Vector3 rot_deg) {
+        return set_rotation_rad(rot_deg.to_radians());
     }
 
-    void set_rotation_deg(double const x_deg, double const y_deg, double const z_deg) {
-        set_rotation_rad(Vector3(x_deg, y_deg, z_deg).to_radians());
+    Node& set_rotation_deg(double const x_deg, double const y_deg, double const z_deg) {
+        return set_rotation_rad(Vector3(x_deg, y_deg, z_deg).to_radians());
     }
 
-    void rotate(const Quaternion& delta) {
+    Node& rotate(const Quaternion &delta) {
         rotation = (delta * rotation).normalized();
         if (!is_local_transform_dirty) {
             set_transform_dirty();
         }
+        return *this;
     }
 
-    void rotate_rad(const Vector3& rot_rad) {
+    Node& rotate_rad(const Vector3 &rot_rad) {
         Quaternion delta = Quaternion::from_euler(rot_rad);
 
-        rotate(delta);
+        return rotate(delta);
     }
 
-    void rotate_rad(double const x_rad, double const y_rad, double const z_rad) {
-        rotate_rad({x_rad, y_rad, z_rad});
+    Node& rotate_rad(double const x_rad, double const y_rad, double const z_rad) {
+        return rotate_rad({x_rad, y_rad, z_rad});
     }
 
-    void rotate_deg(Vector3 rot_deg) {
-        rotate_rad(rot_deg.to_radians());
+    Node& rotate_deg(Vector3 rot_deg) {
+        return rotate_rad(rot_deg.to_radians());
     }
 
-    void rotate_deg(double const x_deg, double const y_deg, double const z_deg) {
-        rotate_rad(Vector3(x_deg, y_deg, z_deg).to_radians());
+    Node& rotate_deg(double const x_deg, double const y_deg, double const z_deg) {
+        return rotate_rad(Vector3(x_deg, y_deg, z_deg).to_radians());
     }
 
     const Transform& get_local_transform() const;
+
     const Transform& get_global_transform() const;
 };
 
