@@ -204,6 +204,25 @@ Quaternion Transform::get_rotation() const {
     return q.normalized();
 }
 
+Vector3 Transform::get_forward() const {
+    // 3rd column represents z axis
+    Vector3 z_axis = {data[2], data[6], data[10]};
+
+    return (z_axis * -1).normalize();
+}
+
+Vector3 Transform::get_up() const {
+    Vector3 y_axis = {data[1], data[5], data[9]};
+
+    return y_axis.normalize();
+}
+
+Vector3 Transform::get_right() const {
+    Vector3 x_axis = {data[0], data[4], data[8]};
+
+    return x_axis.normalize();
+}
+
 
 Transform Transform::perspective(double fov_rad, double aspect, double z_near, double z_far) {
     // [f/aspect, 0, 0, 0]

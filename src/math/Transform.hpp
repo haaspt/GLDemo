@@ -78,6 +78,12 @@ public:
 
     Quaternion get_rotation() const;
 
+    Vector3 get_forward() const;
+
+    Vector3 get_up() const;
+
+    Vector3 get_right() const;
+
     static Transform perspective(double fov_rad, double aspect, double z_near, double z_far);
 
     glm::mat4 to_glm() const {
