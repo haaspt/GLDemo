@@ -6,12 +6,12 @@
 
 #include <memory>
 
-#include "scene/Scene.hpp"
-#include "scene/Prefab.hpp"
-#include "objects/Camera.hpp"
-#include "objects/LightSource.hpp"
-#include "objects/GameObject.hpp"
-#include "objects/Node.hpp"
+#include "engine/scene/Scene.hpp"
+#include "engine/scene/Prefab.hpp"
+#include "engine/objects/Camera.hpp"
+#include "engine/objects/LightSource.hpp"
+#include "engine/objects/GameObject.hpp"
+#include "engine/objects/Node.hpp"
 
 class ShipNode : public Node {
 private:

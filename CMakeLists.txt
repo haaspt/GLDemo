@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(GLDemo LANGUAGES CXX)
+project(DemoEngine LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -11,6 +11,8 @@ if (APPLE)
 endif ()
 
 include(FetchContent)
+
+find_package(OpenGL REQUIRED)
 
 # Speed up third-party builds
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
@@ -65,7 +67,6 @@ if (NOT imgui_POPULATED)
             ${imgui_SOURCE_DIR}/imgui_draw.cpp
             ${imgui_SOURCE_DIR}/imgui_tables.cpp
             ${imgui_SOURCE_DIR}/imgui_widgets.cpp
-            # Backend files for GLFW + OpenGL3
             ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
             ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
     )
@@ -80,109 +81,111 @@ endif ()
 
 FetchContent_MakeAvailable(glfw glm assimp imgui googletest)
 
-# OpenGL linking (portable)
-find_package(OpenGL REQUIRED)
+# ---Engine---
 
-add_executable(GLDemo
-        src/main.cpp
-        src/resources/Shader.cpp
-        src/resources/Shader.hpp
-        src/objects/GameObject.cpp
-        src/objects/GameObject.hpp
-        src/utilities/Input.cpp
-        src/utilities/Input.hpp
-        src/utilities/Utils.hpp
-        src/math/Vector.hpp
-        src/resources/ResourceManager.cpp
-        src/resources/ResourceManager.hpp
-        src/objects/Node.cpp
-        src/objects/Node.hpp
-        src/game/Globals.hpp
-        src/third_party/stb_image_impl.cpp
-        src/resources/Model.cpp
-        src/resources/Model.hpp
-        src/objects/LightSource.cpp
-        src/objects/LightSource.hpp
-        src/objects/RenderedObject.hpp
-        src/controllers/BaseController.hpp
-        src/objects/Camera.cpp
-        src/objects/Camera.hpp
-        src/controllers/FPSController.cpp
-        src/controllers/FPSController.hpp
-        src/math/Transform.cpp
-        src/math/Transform.hpp
-        src/math/Quaternion.cpp
-        src/math/Quaternion.hpp
-        src/math/Utils.hpp
-        src/resources/Skybox.cpp
-        src/resources/Skybox.hpp
-        src/scene/Scene.hpp
-        src/controllers/FollowController.cpp
-        src/controllers/FollowController.hpp
-        src/scene/Prefab.hpp
-        src/game/SpaceDemo.hpp
+add_library(engine
+        src/engine/resources/Shader.cpp
+        src/engine/resources/Shader.hpp
+        src/engine/objects/GameObject.cpp
+        src/engine/objects/GameObject.hpp
+        src/engine/utilities/Input.cpp
+        src/engine/utilities/Input.hpp
+        src/engine/utilities/Utils.hpp
+        src/engine/math/Vector.hpp
+        src/engine/resources/ResourceManager.cpp
+        src/engine/resources/ResourceManager.hpp
+        src/engine/objects/Node.cpp
+        src/engine/objects/Node.hpp
+        src/engine/third_party/stb_image_impl.cpp
+        src/engine/resources/Model.cpp
+        src/engine/resources/Model.hpp
+        src/engine/objects/LightSource.cpp
+        src/engine/objects/LightSource.hpp
+        src/engine/objects/RenderedObject.hpp
+        src/engine/controllers/BaseController.hpp
+        src/engine/objects/Camera.cpp
+        src/engine/objects/Camera.hpp
+        src/engine/controllers/FPSController.cpp
+        src/engine/controllers/FPSController.hpp
+        src/engine/math/Transform.cpp
+        src/engine/math/Transform.hpp
+        src/engine/math/Quaternion.cpp
+        src/engine/math/Quaternion.hpp
+        src/engine/math/Utils.hpp
+        src/engine/resources/Skybox.cpp
+        src/engine/resources/Skybox.hpp
+        src/engine/scene/Scene.hpp
+        src/engine/controllers/FollowController.cpp
+        src/engine/controllers/FollowController.hpp
+        src/engine/scene/Prefab.hpp
 )
 
-target_include_directories(GLDemo PRIVATE ${CMAKE_SOURCE_DIR}/src)
-target_include_directories(GLDemo PRIVATE
+target_include_directories(engine PUBLIC
+        ${CMAKE_SOURCE_DIR}/src
         ${stb_SOURCE_DIR}
 )
 
-target_link_libraries(GLDemo PRIVATE
+target_link_libraries(engine PUBLIC
         glfw
         assimp::assimp
         glm::glm
-        imgui
         OpenGL::GL
 )
 
 if (APPLE)
-    target_link_libraries(GLDemo PRIVATE "-framework OpenGL")
+    target_link_libraries(engine PUBLIC "-framework OpenGL")
 endif ()
+
+target_compile_options(engine PRIVATE -Wall -Wextra -Wpedantic)
+
+# --- Game ---
+add_executable(game
+        src/game/main_game.cpp
+        src/game/Globals.hpp
+        src/game/SpaceDemo.hpp
+)
+
+target_link_libraries(game PRIVATE engine)
+
+target_compile_options(game PRIVATE -Wall -Wextra -Wpedantic)
+
+# --- Editor ---
+add_executable(editor
+        src/editor/main_editor.cpp
+)
+
+target_link_libraries(editor PRIVATE
+        engine
+        imgui
+)
+
+target_compile_options(editor PRIVATE -Wall -Wextra -Wpedantic)
 
 # --- Tests ---
 enable_testing()
 
-# Pick up all test sources automatically
 file(GLOB TEST_SOURCES CONFIGURE_DEPENDS tests/*.cpp)
-
-# Add ONLY the implementation files that your tests call into.
-# (This solves the "undefined symbols" without touching GLDemo.)
-set(TEST_IMPL_SOURCES
-        src/math/Transform.cpp
-        src/math/Quaternion.cpp
-        src/objects/Node.cpp
-        # add other .cpp files here if future tests need them
-)
 
 add_executable(tests
         ${TEST_SOURCES}
-        ${TEST_IMPL_SOURCES}
 )
 
-# So tests can include project headers like "math/Transform.hpp"
-target_include_directories(tests PRIVATE ${CMAKE_SOURCE_DIR}/src)
-
-# Link GoogleTest and whatever libraries your code under test needs
 target_link_libraries(tests PRIVATE
-        glm::glm
-        assimp::assimp
-        GTest::gtest_main        # supplies main(); don't also write your own
-        GTest::gmock             # optional—remove if you don't use mocks
+        engine
+        GTest::gtest_main
+        GTest::gmock
 )
 
-# Let CTest/CLion discover individual TEST() cases
 include(GoogleTest)
 gtest_discover_tests(tests)
 
-# (Nice to have warnings)
 target_compile_options(tests PRIVATE -Wall -Wextra -Wpedantic)
 
 # --- Runtime assets ---
 set(SHADER_DIR ${CMAKE_SOURCE_DIR}/src/game/shaders)
 set(MODEL_DIR ${CMAKE_SOURCE_DIR}/src/game/models)
 set(TEXTURE_DIR ${CMAKE_SOURCE_DIR}/src/game/textures)
-set(RUNTIME_ASSET_DIR $<TARGET_FILE_DIR:GLDemo>)
+set(RUNTIME_ASSET_DIR $<TARGET_FILE_DIR:game>)
 
 file(GLOB_RECURSE SHADER_FILES CONFIGURE_DEPENDS
         "${SHADER_DIR}/*")
@@ -192,15 +195,12 @@ file(GLOB_RECURSE TEXTURE_FILES CONFIGURE_DEPENDS
         "${TEXTURE_DIR}/*")
 
 add_custom_target(copy_assets ALL
-        COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:GLDemo>/shaders"
-        COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:GLDemo>/models"
-        COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:GLDemo>/textures"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "${SHADER_DIR}" "$<TARGET_FILE_DIR:GLDemo>/shaders"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "${MODEL_DIR}" "$<TARGET_FILE_DIR:GLDemo>/models"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "${TEXTURE_DIR}" "$<TARGET_FILE_DIR:GLDemo>/textures"
+        COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:game>/shaders"
+        COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:game>/models"
+        COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:game>/textures"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "${SHADER_DIR}" "$<TARGET_FILE_DIR:game>/shaders"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "${MODEL_DIR}" "$<TARGET_FILE_DIR:game>/models"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "${TEXTURE_DIR}" "$<TARGET_FILE_DIR:game>/textures"
         COMMENT "Copying shaders/models/textures to runtime directory"
 )
-add_dependencies(GLDemo copy_assets)
-
-target_compile_options(GLDemo PRIVATE -Wall -Wextra -Wpedantic)
-target_compile_options(tests PRIVATE -Wall -Wextra -Wpedantic)
+add_dependencies(game copy_assets)

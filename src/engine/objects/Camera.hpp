@@ -1,0 +1,48 @@
+//
+// Created by Patrick Haas on 11/23/25.
+//
+
+#pragma once
+
+#include "engine/objects/Node.hpp"
+#include "engine/math/Vector.hpp"
+#include "engine/utilities/Utils.hpp"
+#include "engine/controllers/BaseController.hpp"
+
+class Camera : public Node {
+private:
+    Transform projection;
+    mutable Transform view{};
+
+    void update_view_matrix() const;
+
+public:
+    Camera(double fov_deg, double aspect_ratio, double near_plane_dist, double far_plane_dist,
+           Vector3 pos = Vector3{0.0}, std::unique_ptr<BaseController> controller = {})
+        : projection(Transform::perspective(
+              Utils::to_radians(fov_deg),
+              aspect_ratio,
+              near_plane_dist,
+              far_plane_dist
+          )) {
+        controller_ = std::move(controller);
+        properties = properties | SceneProperties::CAMERA;
+        set_position(pos);
+    }
+
+    Camera(Camera&& other) noexcept
+        : Node(std::move(other)),
+          projection(other.projection) {}
+
+    Camera& operator=(Camera&& other) noexcept {
+        if (this != &other) {
+            Node::operator=(std::move(other));
+        }
+        return *this;
+    }
+
+    void update(double delta_t) override;
+
+    const Transform& get_view_matrix() const;
+    const Transform& get_projection_matrix() const { return projection; }
+};
