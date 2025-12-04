@@ -118,6 +118,8 @@ add_library(engine
         src/engine/controllers/FollowController.cpp
         src/engine/controllers/FollowController.hpp
         src/engine/scene/Prefab.hpp
+        src/engine/application/Application.cpp
+        src/engine/application/Application.hpp
 )
 
 target_include_directories(engine PUBLIC

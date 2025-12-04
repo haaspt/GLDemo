@@ -7,7 +7,10 @@
 
 namespace Scene {
     struct Prefab {
+        NodeId parent_id = 0;
+
         virtual ~Prefab() noexcept = default;
-        virtual NodeId initialize(Scene& scene, NodeId parent_id) = 0;
+
+        virtual NodeId initialize(Scene &scene) const = 0;
     };
 }

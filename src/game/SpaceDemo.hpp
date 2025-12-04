@@ -12,6 +12,7 @@
 #include "engine/objects/LightSource.hpp"
 #include "engine/objects/GameObject.hpp"
 #include "engine/objects/Node.hpp"
+#include "engine/application/Application.hpp"
 
 class ShipNode : public Node {
 private:
@@ -131,7 +132,7 @@ public:
 struct ShipPrefab : Scene::Prefab {
     double aspect_ratio;
 
-    Scene::NodeId initialize(Scene::Scene &scene, Scene::NodeId parent_id) override {
+    Scene::NodeId initialize(Scene::Scene &scene) const override {
         auto root = std::make_unique<ShipNode>();
         root->set_controller(std::make_unique<ShipController>());
         auto root_id = scene.add_scene_object(std::move(root), parent_id);
@@ -150,5 +151,58 @@ struct ShipPrefab : Scene::Prefab {
         scene.add_scene_object(std::move(exhaust_light), ship_id);
 
         return root_id;
+    }
+};
+
+struct DebrisPrefab : Scene::Prefab {
+    unsigned int n_objects = 100;
+
+    Scene::NodeId initialize(Scene::Scene& scene) const override {
+        auto root_node = std::make_unique<Node>();
+        auto root_id = scene.add_scene_object(std::move(root_node),0);
+        for (unsigned int i = 0; i < n_objects; i++) {
+            Vector3 spawn_point = {
+                Utils::Random::range(-1000.0f, 1000.0),
+                Utils::Random::range(-1000.0f, 1000.0),
+                Utils::Random::range(-1000.0f, 1000.0)
+            };
+            Vector3 spawn_rotation = {
+                90.0 * Utils::Random::range(0, 4),
+                90.0 * Utils::Random::range(0, 4),
+                90.0 * Utils::Random::range(0, 4)
+            };
+            auto suzanne = scene.add_scene_object(std::make_unique<GameObject>("suzanne.gltf", "default"), root_id);
+            scene.get_scene_object(suzanne).set_position(spawn_point).set_rotation_deg(spawn_rotation).set_scale(7,7,7);
+        }
+        return root_id;
+    }
+};
+
+class SpaceGame : public Application {
+public:
+    SpaceGame(char** argv)
+        : Application(argv, 1200, 900, "SpaceFax") {}
+
+    void setup() override {
+        set_main_scene(std::make_unique<Scene::Scene>());
+
+        auto ship_prefab = ShipPrefab();
+        ship_prefab.aspect_ratio = get_aspect_ratio();
+        add_prefab_to_scene(ship_prefab);
+
+        auto debris_prefab = DebrisPrefab();
+        add_prefab_to_scene(debris_prefab);
+
+        std::vector<std::string> skybox_textures = {
+            exe_dir_path_ / "textures/skybox/px.png",
+            exe_dir_path_ / "textures/skybox/nx.png",
+            exe_dir_path_ / "textures/skybox/py.png",
+            exe_dir_path_ / "textures/skybox/ny.png",
+            exe_dir_path_ / "textures/skybox/pz.png",
+            exe_dir_path_ / "textures/skybox/nz.png",
+        };
+        main_scene_->create_skybox(skybox_textures);
+
+        initialized = true;
     }
 };
