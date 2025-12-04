@@ -55,7 +55,7 @@ public:
                                               max_visual_roll);
 
             Quaternion target_rot = Quaternion::from_euler(
-                Vector3(target_pitch, target_yaw, target_roll)
+                Vector3(target_pitch, 0, target_roll)
             );
 
             Quaternion current = ship_mesh->get_local_transform().get_rotation().normalized();
@@ -123,7 +123,6 @@ public:
         double damping = std::exp(-strafe_damping * delta_t);
         v_lateral *= damping;
 
-        // --- 6. Recombine velocity ---
         vel = v_forward + v_lateral;
         node.set_velocity(vel);
     }
