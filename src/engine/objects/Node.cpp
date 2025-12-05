@@ -104,3 +104,33 @@ void Node::update(double const delta_t) {
         set_transform_dirty();
     }
 }
+
+Node &Node::look_at(Vector3 pos) {
+    const Vector3 eye = position;
+    Vector3 forward = (pos - eye).normalized();
+    Vector3 up(0.0, 1.0, 0.0);
+
+    if (std::abs(forward.dot(up)) > 0.999) {
+        // Looking straight up/down
+        up = Vector3(1.0, 0.0, 0.0);
+    }
+
+    Vector3 right = forward.cross(up).normalized();
+    up = right.cross(forward);
+
+    Transform rot(1.0);
+    rot.at(0, 0) = right.x;
+    rot.at(1, 0) = right.y;
+    rot.at(2, 0) = right.z;
+    rot.at(0, 1) = up.x;
+    rot.at(1, 1) = up.y;
+    rot.at(2, 1) = up.z;
+    rot.at(0, 2) = -forward.x;
+    rot.at(1, 2) = -forward.y;
+    rot.at(2, 2) = -forward.z;
+
+    Quaternion q_rot = rot.get_rotation();
+    set_rotation(q_rot);
+    return *this;
+
+}

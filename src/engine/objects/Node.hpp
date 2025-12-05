@@ -205,6 +205,8 @@ public:
         return rotate_rad(Vector3(x_deg, y_deg, z_deg).to_radians());
     }
 
+    Node& look_at(Vector3 pos);
+
     const Transform& get_local_transform() const;
 
     const Transform& get_global_transform() const;
