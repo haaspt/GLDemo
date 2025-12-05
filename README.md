@@ -42,7 +42,7 @@ int main(int /*argc*/, char** argv) {
 }
 ```
 
-### Scene::Scene
+#### Scene::Scene
 The Scene object owns and orchestrates the objects that make up the game. Objects can be added to the scene one by one or in groups using Scene::Prefab. Once added, objects can be referenced and retrieved from the scene using their auto-generated ids.
 
 While objects maintain a hierarchical relationship to one another, the scene actually maintains them in a flat map data structure. All scene objects are stored as unique pointers to the `Node` base class. Special scene behavior can be triggered by assigning `SceneProperties` to the derived class.
@@ -71,7 +71,7 @@ auto camera_id = scene.add_scene_object(std::make_unique<Camera>(
 scene.get_scene_object(camera_id).set_position(5, 5, 5).look_at({0,0,0});
 ```
 
-### Scene::Prefab
+#### Scene::Prefab
 Creating complex scene hierarchies quickly results in a lot of boilerplate. To make this a little easier there is the `Prefab` struct.
 
 Prefabs are designed to contain code snippets like the one above that result in the creation of portion of a scene tree.
@@ -80,7 +80,7 @@ A user creates a prefab by inheriting from the base object and overriding the `i
 
 Both the editor and the demo game contain examples of how prefabs might work and how they are integrated into an Application.
 
-### Objects
+#### Objects
 Game logic, visual components, and (eventually) physics are all encapsulated in Objects. Objects are inspired by Godot's Nodes and use a combination of inheritance, composition, and hierarchical nesting to achieve reusable game logic.
 
 This is the current object taxonomy:
@@ -99,7 +99,7 @@ Game logic lives in the `update()` method. This method is called every frame by 
 
 Users can create custom objects by inheriting from the appropriate Object class and overriding the `update()` method with custom logic. Alternatively (or in addition), object behavior can be augmented by assigning a custom controller. Controllers are called during the update loop so they're useful for creating reusable behavioral code. See the example `ShipController` class in the demo game.
 
-### Resources
+#### Resources
 Resources are relatively memory-heavy entities that can be shared across many Objects. Currently this includes: textures, shaders, and models (which contain a mesh and optionally a texture).
 
 Resources are managed by a ResourceManager singleton that can be accessed via `Manager::manager_name::get("relative_path_to_resource")`. For example:
@@ -110,13 +110,13 @@ The managers doll out raw pointers. They maintain a crude form of ref-counting s
 
 To that end, any Object that contains a resource pointer **must** call the `release()` method on the manager singleton. Not doing so will result in memory leaks.
 
-### Singletons
+#### Singletons
 There are currently two singletons of note in the project. Both need to be initialized at the beginning of any game. Currently this is handled in the `Application` constructor.
 
 - `Managers`: discussed above
 - `Input`: provides user input information. It must be polled once a frame, which is handled automatically by the `Application` loop. Currently it has very limited functionality.
 
-### Vector Math
+#### Vector Math
 I've implemented custom classes for vectors—`Vector2`, `Vector3`, and the not-very-useful `Vector4`—as well as transformation matrices (`Transform`) and quaternions (`Quaternion`).
 
 Transforms are 4x4 matrices that are stored in row-major order. There are helper methods to apply rotation, translation, and scaling as well as create perspective and view matrices. Matrix values can be set directly with the `at(row, column)` method if you know what you're doing. While rotation can be achieved using Euler angles directly, I'd advise using the Quaternions and the `slerp` method to avoid gimble lock and other weird things I don't really understand about 3D rotation.
