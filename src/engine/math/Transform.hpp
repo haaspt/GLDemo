@@ -86,6 +86,8 @@ public:
 
     static Transform perspective(double fov_rad, double aspect, double z_near, double z_far);
 
+    static Transform look_at(const Vector3& eye, const Vector3& target, const Vector3& up = Vector3(0.0, 1.0, 0.0));
+
     glm::mat4 to_glm() const {
         // Convert from row-major to GLM's column-major order
         return {
@@ -104,5 +106,3 @@ public:
         };
     }
 };
-
-Transform look_at(const Vector3& eye, const Vector3& target, const Vector3& up = Vector3(0.0, 1.0, 0.0));

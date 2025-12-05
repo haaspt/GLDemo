@@ -37,5 +37,5 @@ void Camera::update_view_matrix() const {
     Vector3 forward = rotate_vec(global_forward);
     Vector3 up      = rotate_vec(global_up);
 
-    view = look_at(eye, eye + forward, up);
+    view = Transform::look_at(eye, eye + forward, up);
 }

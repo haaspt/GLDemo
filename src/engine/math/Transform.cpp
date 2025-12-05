@@ -242,7 +242,7 @@ Transform Transform::perspective(double fov_rad, double aspect, double z_near, d
     return result;
 }
 
-Transform look_at(const Vector3& eye, const Vector3& target, const Vector3& up) {
+Transform Transform::look_at(const Vector3& eye, const Vector3& target, const Vector3& up) {
     const Vector3 f = (target - eye).normalized();
     const Vector3 s = f.cross(up).normalized();
     const Vector3 u = s.cross(f);
