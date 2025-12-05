@@ -154,6 +154,8 @@ target_compile_options(game PRIVATE -Wall -Wextra -Wpedantic)
 # --- Editor ---
 add_executable(editor
         src/editor/main_editor.cpp
+        src/editor/Editor.cpp
+        src/editor/Editor.hpp
 )
 
 target_link_libraries(editor PRIVATE

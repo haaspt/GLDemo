@@ -5,6 +5,10 @@
 // TODO create an entire editor
 // no biggie...
 
+#include "Editor.hpp"
+
 int main(int /*argc*/, char** argv) {
-    return 0;
+    Editor editor{argv};
+    editor.setup();
+    return editor.loop();
 }
