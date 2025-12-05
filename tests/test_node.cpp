@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 #include <cmath>
 
-#include "../src/objects/Node.hpp"
-#include "../src/math/Vector.hpp"
-#include "../src/math/Transform.hpp"
-#include "../src/math/Quaternion.hpp"
+#include "../src/engine/objects/Node.hpp"
+#include "../src/engine/math/Vector.hpp"
+#include "../src/engine/math/Transform.hpp"
+#include "../src/engine/math/Quaternion.hpp"
 
 // Simple subclass to verify process() is called by update()
 class TestNode : public Node {
@@ -33,7 +33,7 @@ static bool matricesEqual(const glm::mat4& a, const glm::mat4& b, double eps = N
 // Default node should have identity transform
 TEST(NodeTest, DefaultTransformIsIdentity) {
     Node n;
-    const Transform& t = n.get_transform();
+    const Transform& t = n.get_local_transform();
 
     glm::mat4 m = t.to_glm();
     glm::mat4 identity(1.0f);
@@ -46,7 +46,7 @@ TEST(NodeTest, PositionAffectsTransformTranslation) {
     Node n;
     n.set_position(1.0, 2.0, 3.0);
 
-    const Transform& t = n.get_transform();
+    const Transform& t = n.get_local_transform();
     glm::mat4 m = t.to_glm();
 
     // Translation is column 3 in glm::mat4 (x,y,z,w)
@@ -61,7 +61,7 @@ TEST(NodeTest, ScaleAffectsTransform) {
     Node n;
     n.set_scale(2.0, 3.0, 4.0);
 
-    const Transform& t = n.get_transform();
+    const Transform& t = n.get_local_transform();
     glm::mat4 m = t.to_glm();
 
     // Diagonal entries of upper-left 3x3 should be scale factors,
@@ -83,7 +83,7 @@ TEST(NodeTest, RotationMatchesTransformFromQuaternion) {
     n.set_scale(scale);
     n.set_rotation_rad(euler);
 
-    const Transform& node_t = n.get_transform();
+    const Transform& node_t = n.get_local_transform();
     glm::mat4 node_m = node_t.to_glm();
 
     // Build expected transform using the same building blocks as Node:
@@ -116,7 +116,7 @@ TEST(NodeTest, UpdateAdvancesPositionByVelocity) {
     EXPECT_NEAR(pos.z, 0.5 * dt, NODE_EPS);
 
     // Transform should reflect new position
-    const Transform& t = n.get_transform();
+    const Transform& t = n.get_local_transform();
     glm::mat4 m = t.to_glm();
     EXPECT_NEAR(m[3][0], pos.x, NODE_EPS);
     EXPECT_NEAR(m[3][1], pos.y, NODE_EPS);
@@ -140,12 +140,12 @@ TEST(NodeTest, RotateRadChangesOrientation) {
     Node n;
 
     // Start with identity
-    glm::mat4 before = n.get_transform().to_glm();
+    glm::mat4 before = n.get_local_transform().to_glm();
 
     // Apply a small rotation around Y
     n.rotate_rad(0.0, 0.5, 0.0);
 
-    glm::mat4 after = n.get_transform().to_glm();
+    glm::mat4 after = n.get_local_transform().to_glm();
 
     // They should not be equal (beyond a tiny epsilon)
     bool same = matricesEqual(before, after, 1e-9);

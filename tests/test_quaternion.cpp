@@ -2,8 +2,8 @@
 // Created by Tyler Haas on 11/25/25.
 //
 #include <gtest/gtest.h>
-#include "../src/math/Quaternion.hpp"
-#include "../src/math/Vector.hpp"
+#include "../src/engine/math/Quaternion.hpp"
+#include "../src/engine/math/Vector.hpp"
 #include <glm/gtc/quaternion.hpp>
 #include <glm/glm.hpp>
 #include <cmath>

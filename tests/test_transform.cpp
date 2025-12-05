@@ -2,10 +2,10 @@
 #include <cmath>
 #include <iostream>
 
-#include "../src/math/Vector.hpp"
-#include "../src/math/Transform.hpp"
-#include "../src/math/Quaternion.hpp"
-#include "../src/math/Utils.hpp"
+#include "../src/engine/math/Vector.hpp"
+#include "../src/engine/math/Transform.hpp"
+#include "../src/engine/math/Quaternion.hpp"
+#include "../src/engine/math/Utils.hpp"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -154,7 +154,7 @@ TEST(TransformTest, LookAt) {
     Vector3 target(0.0, 0.0, 0.0);
     Vector3 up(0.0, 1.0, 0.0);
 
-    Transform view = look_at(eye, target, up);
+    Transform view = Transform::look_at(eye, target, up);
     glm::mat4 glm_view = glm::lookAt(
         glm::vec3(0.0f, 0.0f, 5.0f),
         glm::vec3(0.0f, 0.0f, 0.0f),
