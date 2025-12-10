@@ -16,8 +16,7 @@ namespace Model {
             aiString texture_path;
             ai_material->GetTexture(aiTextureType_DIFFUSE, 0, &texture_path);
             std::filesystem::path path = texture_path.C_Str();
-            texture_name_ = path.filename();  // for now just assume it's always in the /texture/ folder
-            texture_ = Managers::texture_manager().get(texture_name_);
+            texture_ = Managers::texture_manager().get(path.filename());
         }
 
         // TODO Blender uses PBR, not Phong lighting
@@ -50,29 +49,6 @@ namespace Model {
         // specular_.z = specular.b;
 
         shininess_ = shininess;
-    }
-
-    Material::~Material() noexcept {
-        if (texture_) {
-            Managers::texture_manager().release(texture_name_);
-        }
-    }
-
-    Material::Material(Material&& other) noexcept
-        : texture_(other.texture_), texture_name_(std::move(other.texture_name_)) {
-        other.texture_ = nullptr;
-    }
-
-    Material& Material::operator=(Material&& other) noexcept {
-        if (this != &other) {
-            Managers::texture_manager().release(texture_name_);
-
-            texture_ = other.texture_;
-            texture_name_ = std::move(other.texture_name_);
-
-            other.texture_ = nullptr;
-        }
-        return *this;
     }
 
 

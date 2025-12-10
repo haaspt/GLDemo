@@ -14,39 +14,31 @@
 
 template<class Resource, class Loader>
 class ResourceManager {
-private:
-    struct Entry {
-        Resource* ptr;
-        int ref_count;
-    };
-
-    std::unordered_map<std::string, Entry> resources = {};
+protected:
+    mutable std::unordered_map<std::string, std::weak_ptr<Resource>> resources_ = {};
     Loader loader;
 
 public:
     explicit ResourceManager(Loader loader) : loader(std::move(loader)) {
     };
 
-    Resource* get(const std::string& name) {
-        auto it = resources.find(name);
-        if (it == resources.end()) {
-            Resource* new_res = loader.load(name);
-            Entry new_entry{new_res, 1};
-            resources[name] = new_entry;
+    std::shared_ptr<Resource> get(const std::string& name) const {
+        auto it = resources_.find(name);
+        if ((it == resources_.end()) or (it->second.expired())) {
+            std::shared_ptr<Resource> new_res = loader.load(name);
+            resources_[name] = new_res;
             return new_res;
         }
-        it->second.ref_count += 1;
-        return it->second.ptr;
+        return it->second.lock();
     }
 
-    void release(const std::string& name) noexcept {
-        auto it = resources.find(name);
-        if (it == resources.end()) return;
-
-        it->second.ref_count -= 1;
-        if (it->second.ref_count < 1) {
-            loader.unload(it->second.ptr);
-            resources.erase(it);
+    void clean() {
+        for (auto it = resources_.begin(); it != resources_.end(); ) {
+            if (it->second.expired()) {
+                it = resources_.erase(it);
+            } else {
+                ++it;
+            }
         }
     }
 };
@@ -57,19 +49,14 @@ struct ShaderLoader {
     explicit ShaderLoader(const std::string& shader_dir) : shader_dir(shader_dir) {
     };
 
-    Shader* load(const std::string& shader_name) const {
+    std::shared_ptr<Shader> load(const std::string& shader_name) const {
         const auto vertex_shader_path = shader_dir / (shader_name + ".vert");
         const auto fragment_shader_path = shader_dir / (shader_name + ".frag");
 
-        Shader* shader = new Shader(
+        return std::make_shared<Shader>(
             vertex_shader_path.string(),
             fragment_shader_path.string()
         );
-        return shader;
-    }
-
-    void unload(Shader* shader) noexcept {
-        delete shader;
     }
 };
 
@@ -79,15 +66,10 @@ struct TextureLoader {
     explicit TextureLoader(const std::string& texture_dir) : texture_dir(texture_dir) {
     };
 
-    Texture* load(const std::string& texture_name, bool srgb = true) {
+    std::shared_ptr<Texture> load(const std::string& texture_name, bool srgb = true) const {
         const auto texture_file_path = texture_dir / texture_name;
 
-        Texture* new_tex = new Texture(texture_file_path, srgb);
-        return new_tex;
-    }
-
-    void unload(Texture* texture) noexcept {
-        delete texture;
+        return std::make_shared<Texture>(texture_file_path, srgb);
     }
 };
 
@@ -97,15 +79,10 @@ struct ModelLoader {
     explicit ModelLoader(const std::string& model_dir) : model_dir(model_dir) {
     }
 
-    Model::Model* load(const std::string& model_name) {
+    std::shared_ptr<Model::Model> load(const std::string& model_name) const {
         const auto model_file_path = model_dir / model_name;
 
-        Model::Model* new_model = new Model::Model(model_file_path);
-        return new_model;
-    }
-
-    void unload(Model::Model* model) noexcept {
-        delete model;
+        return std::make_shared<Model::Model>(model_file_path);
     }
 };
 

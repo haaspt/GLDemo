@@ -19,8 +19,7 @@
 namespace Model {
     class Material {
     private:
-        Texture* texture_ = nullptr;
-        std::string texture_name_;
+        std::shared_ptr<Texture> texture_;
         Vector3 ambient_;
         Vector3 diffuse_;
         Vector3 specular_;
@@ -29,18 +28,18 @@ namespace Model {
     public:
         explicit Material(aiMaterial* ai_material);
 
-        ~Material() noexcept;
+        ~Material() noexcept = default;
 
         Material(const Material&) = delete;
 
         Material& operator=(const Material&) = delete;
 
-        Material(Material&& other) noexcept;
+        Material(Material&& other) noexcept = default;
 
-        Material& operator=(Material&& other) noexcept;
+        Material& operator=(Material&& other) noexcept = default;
 
         bool has_texture() const { return texture_ != nullptr; }
-        Texture* get_texture() const { return texture_; }
+        std::shared_ptr<Texture> get_texture() const { return texture_; }
 
         Vector3 get_ambient() const { return ambient_; }
         Vector3 get_diffuse() const { return diffuse_; }

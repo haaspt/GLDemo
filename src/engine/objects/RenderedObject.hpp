@@ -15,8 +15,8 @@ class Camera;
 
 class RenderedObject : public Node {
 protected:
-    Model::Model* model = nullptr;
-    Shader* shader = nullptr;
+    std::shared_ptr<Model::Model> model;
+    std::shared_ptr<Shader> shader;
 
     std::string model_name;
     std::string shader_name;
@@ -32,15 +32,6 @@ public:
         shader = Managers::shader_manager().get(shader_name);
     };
 
-    ~RenderedObject() noexcept override {
-        if (model) {
-            Managers::model_manager().release(model_name);
-        }
-        if (shader) {
-            Managers::shader_manager().release(shader_name);
-        }
-    }
-
     // No copy
     RenderedObject(const RenderedObject&) = delete;
 
@@ -48,8 +39,8 @@ public:
 
     RenderedObject(RenderedObject&& other) noexcept
         : Node(std::move(other)),
-          model(other.model),
-          shader(other.shader),
+          model(std::move(other.model)),
+          shader(std::move(other.shader)),
           model_name(std::move(other.model_name)),
           shader_name(std::move(other.shader_name)),
           texture_name(std::move(other.texture_name)) {
@@ -63,15 +54,8 @@ public:
     RenderedObject& operator=(RenderedObject&& other) noexcept {
         if (this != &other) {
             Node::operator=(std::move(other));
-
-            if (model) {
-                Managers::model_manager().release(model_name);
-            }
-            if (shader) {
-                Managers::shader_manager().release(shader_name);
-            }
-            model = other.model;
-            shader = other.shader;
+            model = std::move(other.model);
+            shader = std::move(other.shader);
             model_name = std::move(other.model_name);
             shader_name = std::move(other.shader_name);
             texture_name = std::move(other.texture_name);
